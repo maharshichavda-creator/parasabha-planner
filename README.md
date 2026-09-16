@@ -135,3 +135,35 @@ cd frontend
 npm run build
 # serve dist/frontend/browser with any static file server / reverse proxy to the API
 ```
+
+## Deploying to Render (GitHub + Render)
+
+This repo includes a [`render.yaml`](render.yaml) Blueprint that provisions all three pieces
+in one go: a managed PostgreSQL database, the Spring Boot backend (Docker), and the Angular
+frontend (static site).
+
+1. Push this repo to GitHub (already done if you're reading this from GitHub).
+2. In the [Render Dashboard](https://dashboard.render.com), click **New +** → **Blueprint**.
+3. Connect your GitHub account/repo and select this repository. Render auto-detects
+   `render.yaml` at the repo root.
+4. Review the plan (1 database + 2 web services, all on the **free** plan) and click
+   **Apply**.
+5. Wait for all three resources to finish deploying (the backend build takes a few minutes
+   the first time since it builds a Docker image with Maven).
+6. Open the frontend service's URL (e.g. `https://parasabha-planner-frontend.onrender.com`)
+   on your phone's browser — that's your app.
+
+**If Render assigns different service URLs than expected** (e.g. because
+`parasabha-planner-backend` or `parasabha-planner-frontend` was already taken), update:
+- The backend's `CORS_ALLOWED_ORIGINS` env var to match the actual frontend URL.
+- The frontend's `API_BASE_URL` env var to match the actual backend URL (+ `/api`).
+
+Then trigger a manual redeploy of both services from the Render dashboard so the new values
+take effect.
+
+**Free-tier notes:**
+- Free web services spin down after 15 minutes of inactivity and take ~30–60 seconds to
+  wake up on the next request — the first load after idling will feel slow, that's expected.
+- Render's free PostgreSQL database expires 30 days after creation (14-day grace period to
+  upgrade before data is deleted). Upgrade to a paid database plan before then if you want to
+  keep the data long-term.
