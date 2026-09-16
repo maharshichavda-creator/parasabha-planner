@@ -1,3 +1,46 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-spinner {
+    display: inline-block;
+  }
+}
+
+.print-area {
+  background: #fff;
+}
+
+.print-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .week-range {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
 .state-row {
   display: flex;
   align-items: center;
@@ -56,6 +99,13 @@
 
 .day-card {
   height: 100%;
+}
+
+.print-area.pdf-capturing {
+  .day-card {
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
 }
 
 .empty-day {
