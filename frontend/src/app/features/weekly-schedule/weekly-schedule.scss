@@ -25,7 +25,7 @@
 }
 
 .pdf-header {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   text-align: center;
@@ -122,9 +122,79 @@
 }
 
 .print-area.pdf-capturing {
+  padding: 8px 16px;
+
+  .pdf-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    white-space: nowrap;
+  }
+
+  .pdf-header .pdf-logo {
+    height: 56px;
+    margin-bottom: 0;
+  }
+
+  .pdf-header .pdf-header-text {
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .print-title h2 {
+    font-size: 1.05rem;
+  }
+
+  // Fixed 4-column grid keeps all 7 day cards on a single, tidy row pair
+  // instead of stacking narrowly and pushing content onto a second page.
+  .week-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
   .day-card {
     box-shadow: none;
     border: 1px solid rgba(0, 0, 0, 0.15);
+
+    ::ng-deep .mat-mdc-card-header {
+      padding: 8px 10px 0;
+    }
+
+    ::ng-deep .mat-mdc-card-content {
+      padding: 4px 10px 8px;
+    }
+
+    ::ng-deep .mat-mdc-card-title {
+      font-size: 0.95rem;
+    }
+
+    ::ng-deep .mat-mdc-card-subtitle {
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+  }
+
+  .mandal-list {
+    gap: 6px;
+  }
+
+  .mandal-item {
+    padding-bottom: 4px;
+  }
+
+  .mandal-name {
+    font-size: 0.85rem;
+  }
+
+  .swami-chips {
+    margin-top: 2px;
+
+    ::ng-deep .mat-mdc-chip {
+      min-height: 22px;
+      font-size: 0.7rem;
+      padding: 0 8px;
+    }
   }
 }
 

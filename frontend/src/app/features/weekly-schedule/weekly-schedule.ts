@@ -82,6 +82,10 @@ export class WeeklyScheduleComponent {
     // Flatten card shadows while capturing: shadows are expensive to compress and add
     // no value on paper, so dropping them keeps the exported file small.
     element.classList.add('pdf-capturing');
+    // Force a fixed, wide layout while capturing so the day cards always arrange into
+    // a compact multi-column grid, regardless of how narrow the on-screen viewport is.
+    const previousWidth = element.style.width;
+    element.style.width = '1500px';
     try {
       // Lazy-loaded so these libraries don't add to the initial app bundle.
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
@@ -101,25 +105,25 @@ export class WeeklyScheduleComponent {
       const pageHeight = pdf.internal.pageSize.getHeight();
       const usableWidth = pageWidth - margin * 2;
       const usableHeight = pageHeight - margin * 2;
-      const imageHeight = (canvas.height * usableWidth) / canvas.width;
 
-      let heightLeft = imageHeight;
-      let offsetY = margin;
-
-      pdf.addImage(imageData, 'JPEG', margin, offsetY, usableWidth, imageHeight);
-      heightLeft -= usableHeight;
-
-      while (heightLeft > 0) {
-        offsetY = margin - (imageHeight - heightLeft);
-        pdf.addPage();
-        pdf.addImage(imageData, 'JPEG', margin, offsetY, usableWidth, imageHeight);
-        heightLeft -= usableHeight;
+      // Scale to fit within a single page in both dimensions, and center the result,
+      // so the schedule always lands on exactly one page instead of spilling over.
+      let imageWidth = usableWidth;
+      let imageHeight = (canvas.height * usableWidth) / canvas.width;
+      if (imageHeight > usableHeight) {
+        imageHeight = usableHeight;
+        imageWidth = (canvas.width * usableHeight) / canvas.height;
       }
+      const offsetX = margin + (usableWidth - imageWidth) / 2;
+      const offsetY = margin + (usableHeight - imageHeight) / 2;
+
+      pdf.addImage(imageData, 'JPEG', offsetX, offsetY, imageWidth, imageHeight);
 
       pdf.save(`parasabha-schedule-${toIsoDate(this.weekStart())}.pdf`);
     } finally {
       this.downloadingPdf.set(false);
       element.classList.remove('pdf-capturing');
+      element.style.width = previousWidth;
     }
   }
 }
