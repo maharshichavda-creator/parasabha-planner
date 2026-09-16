@@ -150,11 +150,11 @@ frontend (static site).
    **Apply**.
 5. Wait for all three resources to finish deploying (the backend build takes a few minutes
    the first time since it builds a Docker image with Maven).
-6. Open the frontend service's URL (e.g. `https://parasabha-planner-frontend.onrender.com`)
+6. Open the frontend service's URL (e.g. `https://parasabha.onrender.com`)
    on your phone's browser — that's your app.
 
 **If Render assigns different service URLs than expected** (e.g. because
-`parasabha-planner-backend` or `parasabha-planner-frontend` was already taken), update:
+`parasabha-planner-backend` or `parasabha` was already taken), update:
 - The backend's `CORS_ALLOWED_ORIGINS` env var to match the actual frontend URL.
 - The frontend's `API_BASE_URL` env var to match the actual backend URL (+ `/api`).
 

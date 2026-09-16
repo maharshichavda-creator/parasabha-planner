@@ -37,11 +37,11 @@ services:
           property: password
       # Update this if Render assigns your frontend a different URL (e.g. due to a name clash).
       - key: CORS_ALLOWED_ORIGINS
-        value: https://parasabha-planner-frontend.onrender.com
+        value: https://parasabha.onrender.com
 
   # --- Frontend: Angular static site ---
   - type: web
-    name: parasabha-planner-frontend
+    name: parasabha
     runtime: static
     rootDir: frontend
     buildCommand: npm ci && npm run build:render
