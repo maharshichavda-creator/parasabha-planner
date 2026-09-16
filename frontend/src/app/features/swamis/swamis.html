@@ -1,0 +1,54 @@
+<h1><mat-icon>self_improvement</mat-icon> સંતો</h1>
+
+<mat-card class="form-card">
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="swami-form">
+      <mat-form-field appearance="outline" class="name-field">
+        <mat-label>Swami name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g. પૂ. મુનિરત્ન સ્વામી" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-flat-button color="primary" type="submit">
+          {{ editingId() ? 'Update' : 'Add' }} Swami
+        </button>
+        @if (editingId()) {
+          <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+        }
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+@if (loading()) {
+  <p>Loading Sant Mandal list...</p>
+} @else {
+  <table mat-table [dataSource]="swamis()" class="mat-elevation-z1 swami-table">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let swami">{{ swami.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let swami">
+        <button mat-icon-button (click)="startEdit(swami)" aria-label="Edit swami">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="remove(swami)" aria-label="Delete swami">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  @if (swamis().length === 0) {
+    <p class="empty-state">No swamis yet. Add one above.</p>
+  }
+}

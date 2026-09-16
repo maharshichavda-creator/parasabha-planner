@@ -1,0 +1,75 @@
+<h1><mat-icon>calendar_month</mat-icon> સાપ્તાહિક આયોજન</h1>
+
+<div class="week-nav">
+  <button mat-icon-button (click)="previousWeek()" aria-label="Previous week">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <div class="week-nav-label">
+    <span class="week-range">{{ weekRangeLabel() }}</span>
+    @if (isCurrentWeek()) {
+      <span class="current-week-badge">This week</span>
+    }
+  </div>
+
+  <button mat-icon-button (click)="nextWeek()" aria-label="Next week">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+
+  @if (!isCurrentWeek()) {
+    <button mat-stroked-button class="today-btn" (click)="goToCurrentWeek()">Today</button>
+  }
+</div>
+
+@if (loading()) {
+  <div class="state-row">
+    <mat-spinner diameter="32"></mat-spinner>
+    <span>Loading schedule...</span>
+  </div>
+} @else if (error()) {
+  <div class="state-row error">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error() }}</span>
+  </div>
+} @else {
+  <div class="week-grid">
+    @for (day of days(); track day.weekday) {
+      <mat-card class="day-card">
+        <mat-card-header>
+          <mat-card-title>{{ day.weekdayLabel }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ day.weekday }}
+            @if (dateLabelFor(day); as dateLabel) {
+              <span class="date-label">· {{ dateLabel }}</span>
+            }
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (day.entries.length === 0) {
+            <p class="empty-day">No mandals assigned yet.</p>
+          } @else {
+            <ul class="mandal-list">
+              @for (entry of day.entries; track entry.id) {
+                <li class="mandal-item">
+                  <div class="mandal-name-row">
+                    <span class="mandal-name">{{ entry.mandalName }}</span>
+                    @if (entry.mandalPr) {
+                      <span class="pr-badge">PR</span>
+                    }
+                  </div>
+                  @if (entry.swamis.length > 0) {
+                    <mat-chip-set class="swami-chips">
+                      @for (swami of entry.swamis; track swami.id) {
+                        <mat-chip>{{ swami.name }}</mat-chip>
+                      }
+                    </mat-chip-set>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}

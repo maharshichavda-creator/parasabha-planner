@@ -1,0 +1,105 @@
+.state-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+
+  &.error {
+    color: #b3261e;
+  }
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.week-nav-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  justify-content: center;
+}
+
+.week-range {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.current-week-badge {
+  background: #d1f2d1;
+  color: #1b5e20;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.today-btn {
+  margin-left: 8px;
+}
+
+.date-label {
+  margin-left: 4px;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.day-card {
+  height: 100%;
+}
+
+.empty-day {
+  color: rgba(0, 0, 0, 0.5);
+  font-style: italic;
+}
+
+.mandal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mandal-item {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.mandal-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mandal-name {
+  font-weight: 500;
+}
+
+.pr-badge {
+  background: #ffd54f;
+  color: #4a3200;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.swami-chips {
+  margin-top: 6px;
+}

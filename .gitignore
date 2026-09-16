@@ -1,0 +1,14 @@
+# dependency & build artifacts (backend and frontend each have their own detailed .gitignore too)
+target/
+dist/
+node_modules/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db

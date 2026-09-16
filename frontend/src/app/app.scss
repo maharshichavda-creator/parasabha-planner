@@ -1,0 +1,40 @@
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-title {
+  font-weight: 500;
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-logo {
+  height: 40px;
+  width: auto;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.app-nav a.active-link {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.app-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}

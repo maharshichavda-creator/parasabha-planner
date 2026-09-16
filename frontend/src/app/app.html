@@ -1,0 +1,29 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="app-title">
+    <img src="assets/Aksharderi.png" alt="BAPS Logo" class="app-logo" />
+    {{ title() }}
+  </span>
+  <span class="spacer"></span>
+  <nav class="app-nav">
+    <a mat-button routerLink="/weekly" routerLinkActive="active-link">
+      <mat-icon>calendar_month</mat-icon>
+      સાપ્તાહિક આયોજન
+    </a>
+    <a mat-button routerLink="/plan-visits" routerLinkActive="active-link">
+      <mat-icon>edit_calendar</mat-icon>
+      મંડળ આયોજન
+    </a>
+    <a mat-button routerLink="/mandals" routerLinkActive="active-link">
+      <mat-icon>location_city</mat-icon>
+      મંડળો
+    </a>
+    <a mat-button routerLink="/swamis" routerLinkActive="active-link">
+      <mat-icon>self_improvement</mat-icon>
+      સંતો
+    </a>
+  </nav>
+</mat-toolbar>
+
+<main class="app-content">
+  <router-outlet></router-outlet>
+</main>
