@@ -47,6 +47,10 @@ services:
     buildCommand: npm ci && npm run build:render
     staticPublishPath: dist/frontend/browser
     envVars:
+      # Angular 22's CLI requires Node >=22.22.3 / >=24.15.0 / >=26.0.0; pin an explicit
+      # LTS version since Render's current default (24.14.1) doesn't satisfy that.
+      - key: NODE_VERSION
+        value: "22.22.3"
       # Update this if Render assigns your backend a different URL (e.g. due to a name clash).
       - key: API_BASE_URL
         value: https://parasabha-planner-backend.onrender.com/api
