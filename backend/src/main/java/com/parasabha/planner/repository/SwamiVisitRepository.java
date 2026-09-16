@@ -14,5 +14,8 @@ public interface SwamiVisitRepository extends JpaRepository<SwamiVisit, Long> {
 
     Optional<SwamiVisit> findByScheduleEntry_IdAndVisitDate(Long scheduleEntryId, LocalDate visitDate);
 
+    /** Used for PRS entries: their visit's date within a given week can move between saves. */
+    Optional<SwamiVisit> findFirstByScheduleEntry_IdAndVisitDateBetween(Long scheduleEntryId, LocalDate start, LocalDate end);
+
     List<SwamiVisit> findByScheduleEntry_Id(Long scheduleEntryId);
 }

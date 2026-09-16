@@ -240,6 +240,26 @@
   border-radius: 4px;
 }
 
+.prs-badge {
+  background: #90caf9;
+  color: #0d3c61;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 .swami-chips {
   margin-top: 6px;
+}
+
+.swami-role-tag {
+  margin-right: 4px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.vehicle-note {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.65);
 }

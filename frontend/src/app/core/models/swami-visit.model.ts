@@ -11,11 +11,17 @@ export interface SwamiVisit {
   mandalId?: number;
   mandalName?: string;
   mandalPr?: boolean;
+  /** Ordered Sant Mandal for this visit: index 0 = P1, index 1 = P2 (both required), rest are additional. */
   swamis: Swami[];
+  /** Free-text vehicle arrangement (વાહન વ્યવસ્થા) note for this visit - optional. */
+  vehicleArrangement?: string;
 }
 
 export interface SwamiVisitRequest {
   scheduleEntryId: number;
   visitDate: string; // ISO yyyy-MM-dd
+  /** Ordered Swami IDs: index 0 = P1, index 1 = P2 (both required), rest are additional. */
   swamiIds: number[];
+  /** Free-text vehicle arrangement (વાહન વ્યવસ્થા) note for this visit - optional. */
+  vehicleArrangement?: string;
 }

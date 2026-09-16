@@ -1,8 +1,9 @@
 <h1><mat-icon>edit_calendar</mat-icon> મંડળ આયોજન</h1>
 
 <p class="hint">
-  Assign which Swami(s), if any, visit each Mandal for a specific week. A slot stays blank
-  until you plan it here - nothing carries over automatically between weeks.
+  Assign which Swami(s) visit each Mandal for a specific week. P2 (દ્વિતીય સંત) is mandatory;
+  P1 (પ્રથમ સંત) is optional. A slot stays blank until you plan it here - nothing carries
+  over automatically between weeks.
 </p>
 
 <div class="week-nav">
@@ -42,44 +43,93 @@
           }
         </mat-form-field>
 
+        @if (isPrsEntrySelected()) {
+          <mat-form-field appearance="outline">
+            <mat-label>Day (for PRS mandal)</mat-label>
+            <mat-select formControlName="prsWeekday">
+              @for (weekday of prsWeekdayOptions; track weekday) {
+                <mat-option [value]="weekday">{{ weekdayLabels[weekday] }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.prsWeekday.touched && !form.controls.prsWeekday.value) {
+              <mat-error>Please select a day</mat-error>
+            }
+          </mat-form-field>
+        }
+      </div>
+
+      <div class="form-row">
         <mat-form-field appearance="outline">
-          <mat-label>Sant Mandal (Swamis) for this week</mat-label>
-          <mat-select [value]="orderedSwamiIds()" (selectionChange)="onSwamiSelectionChange($event)" multiple>
-            @for (swami of swamis(); track swami.id) {
+          <mat-label>P1 (પ્રથમ સંત) - optional</mat-label>
+          <mat-select formControlName="p1SwamiId">
+            <mat-option [value]="null">— None —</mat-option>
+            @for (swami of p1Options(); track swami.id) {
+              <mat-option [value]="swami.id">{{ swami.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>P2 (દ્વિતીય સંત)</mat-label>
+          <mat-select formControlName="p2SwamiId">
+            @for (swami of p2Options(); track swami.id) {
+              <mat-option [value]="swami.id">{{ swami.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.p2SwamiId.hasError('required') && form.controls.p2SwamiId.touched) {
+            <mat-error>P2 is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Additional Sant Mandal (optional)</mat-label>
+          <mat-select [value]="orderedAdditionalIds()" (selectionChange)="onAdditionalSelectionChange($event)" multiple>
+            @for (swami of additionalOptions(); track swami.id) {
               <mat-option [value]="swami.id">{{ swami.name }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
       </div>
 
-      @if (selectedSwamis().length > 0) {
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>વાહન વ્યવસ્થા (optional)</mat-label>
+          <input matInput formControlName="vehicleArrangement" placeholder="હરિભક્તનું નામ" />
+        </mat-form-field>
+      </div>
+
+      @if (additionalSwamis().length > 0) {
         <div class="selected-swamis">
-          <span class="selected-label">Order:</span>
-          @for (swami of selectedSwamis(); track swami.id; let i = $index) {
+          <span class="selected-label">Additional order:</span>
+          @for (swami of additionalSwamis(); track swami.id; let i = $index) {
             <mat-chip-set>
-              <mat-chip (removed)="removeSwami(swami.id)">
-                {{ i + 1 }}. {{ swami.name }}
+              <mat-chip (removed)="removeAdditionalSwami(swami.id)">
+                {{ i + 3 }}. {{ swami.name }}
                 <button matChipRemove type="button" aria-label="Remove swami">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip>
             </mat-chip-set>
-            <button mat-icon-button type="button" (click)="moveSwami(i, -1)" [disabled]="i === 0" aria-label="Move up">
+            <button
+              mat-icon-button
+              type="button"
+              (click)="moveAdditionalSwami(i, -1)"
+              [disabled]="i === 0"
+              aria-label="Move up"
+            >
               <mat-icon>arrow_upward</mat-icon>
             </button>
             <button
               mat-icon-button
               type="button"
-              (click)="moveSwami(i, 1)"
-              [disabled]="i === selectedSwamis().length - 1"
+              (click)="moveAdditionalSwami(i, 1)"
+              [disabled]="i === additionalSwamis().length - 1"
               aria-label="Move down"
             >
               <mat-icon>arrow_downward</mat-icon>
             </button>
           }
         </div>
-      } @else if (editingEntryId()) {
-        <p class="empty-hint">No swamis selected - saving will leave this slot blank for this week.</p>
       }
 
       <div class="form-actions">
@@ -119,12 +169,32 @@
     </ng-container>
 
     <ng-container matColumnDef="swamis">
-      <th mat-header-cell *matHeaderCellDef>Planned Swamis</th>
+      <th mat-header-cell *matHeaderCellDef>Planned Sant Mandal</th>
       <td mat-cell *matCellDef="let row">
         @if (row.visit && row.visit.swamis.length > 0) {
-          {{ row.visit.swamis.map(s => s.name).join(', ') }}
+          @if (row.visit.swamis.length > 1) {
+            <span class="swami-role"><strong>P1:</strong> {{ row.visit.swamis[0]?.name }}</span>
+            <span class="swami-role"><strong>P2:</strong> {{ row.visit.swamis[1]?.name }}</span>
+            @if (row.visit.swamis.length > 2) {
+              <span class="swami-role">+ {{ row.visit.swamis.slice(2).map(s => s.name).join(', ') }}</span>
+            }
+          } @else {
+            <span class="swami-role"><strong>P1:</strong> —</span>
+            <span class="swami-role"><strong>P2:</strong> {{ row.visit.swamis[0]?.name }}</span>
+          }
         } @else {
           <span class="blank-slot">Not planned</span>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="vehicle">
+      <th mat-header-cell *matHeaderCellDef>વાહન</th>
+      <td mat-cell *matCellDef="let row">
+        @if (row.visit?.vehicleArrangement) {
+          {{ row.visit.vehicleArrangement }}
+        } @else {
+          <span class="blank-slot">—</span>
         }
       </td>
     </ng-container>

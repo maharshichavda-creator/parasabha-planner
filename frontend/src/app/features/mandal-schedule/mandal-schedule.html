@@ -1,0 +1,98 @@
+<h1><mat-icon>event_repeat</mat-icon> મંડળ-વાર ગોઠવણી</h1>
+
+<p class="hint">
+  Assign each Mandal to a weekday so it appears in the weekly schedule and in the visit
+  planning screen. Editing the weekday here moves the Mandal to that day everywhere;
+  removing it clears any planned visits for that slot.
+</p>
+
+<mat-card class="form-card">
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="schedule-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Weekday</mat-label>
+          <mat-select formControlName="weekday">
+            @for (day of weekdays; track day) {
+              <mat-option [value]="day">{{ weekdayLabels[day] }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.weekday.hasError('required') && form.controls.weekday.touched) {
+            <mat-error>Weekday is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Mandal</mat-label>
+          <mat-select formControlName="mandalId">
+            @for (mandal of mandals(); track mandal.id) {
+              <mat-option [value]="mandal.id">{{ mandal.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.mandalId.hasError('required') && form.controls.mandalId.touched) {
+            <mat-error>Mandal is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="sort-order-field">
+          <mat-label>Order (optional)</mat-label>
+          <input matInput type="number" formControlName="sortOrder" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-flat-button color="primary" type="submit">
+          {{ editingId() ? 'Update' : 'Add' }} to schedule
+        </button>
+        @if (editingId()) {
+          <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+        }
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+@if (loading()) {
+  <p>Loading mandal schedule...</p>
+} @else {
+  <table mat-table [dataSource]="sortedEntries()" class="mat-elevation-z1 schedule-table">
+    <ng-container matColumnDef="weekday">
+      <th mat-header-cell *matHeaderCellDef>Weekday</th>
+      <td mat-cell *matCellDef="let entry">{{ weekdayLabel(entry.weekday) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="mandal">
+      <th mat-header-cell *matHeaderCellDef>Mandal</th>
+      <td mat-cell *matCellDef="let entry">
+        {{ entry.mandalName }}
+        @if (entry.mandalPr) {
+          <span class="pr-badge">PR</span>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="sortOrder">
+      <th mat-header-cell *matHeaderCellDef>Order</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.sortOrder }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let entry">
+        <button mat-icon-button (click)="startEdit(entry)" aria-label="Edit schedule entry">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="remove(entry)" aria-label="Remove schedule entry">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  @if (sortedEntries().length === 0) {
+    <p class="empty-state">No mandals scheduled yet. Add one above.</p>
+  }
+}

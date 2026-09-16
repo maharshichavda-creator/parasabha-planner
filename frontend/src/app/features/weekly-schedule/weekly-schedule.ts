@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ScheduleService } from '../../core/services/schedule.service';
-import { WeeklyScheduleDay } from '../../core/models';
+import { ScheduleEntry, WeeklyScheduleDay } from '../../core/models';
 import { addDays, dateForWeekday, formatDay, formatWeekRange, getMondayOf, toIsoDate } from '../../core/utils/week.util';
 
 @Component({
@@ -55,6 +55,20 @@ export class WeeklyScheduleComponent {
   dateLabelFor(day: WeeklyScheduleDay): string | null {
     const date = dateForWeekday(this.weekStart(), day.weekday);
     return date ? formatDay(date) : null;
+  }
+
+  /**
+   * Role label for a Swami at the given position within an entry's ordered list.
+   * Encoding: a single planned Swami IS P2 (P1 left blank); with two or more planned,
+   * index 0 is P1 and index 1 is P2, with any further entries being extra Sant Mandal.
+   */
+  swamiRole(entry: ScheduleEntry, index: number): 'P1' | 'P2' | null {
+    if (entry.swamis.length === 1) {
+      return index === 0 ? 'P2' : null;
+    }
+    if (index === 0) return 'P1';
+    if (index === 1) return 'P2';
+    return null;
   }
 
   previousWeek(): void {

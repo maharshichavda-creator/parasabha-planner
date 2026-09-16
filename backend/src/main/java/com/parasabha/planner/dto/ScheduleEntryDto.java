@@ -25,4 +25,7 @@ public class ScheduleEntryDto {
     private boolean mandalPr;
 
     private List<SwamiDto> swamis;
+
+    /** Free-text vehicle arrangement (વાહન વ્યવસ્થા) note planned for this entry's exact date this week. */
+    private String vehicleArrangement;
 }

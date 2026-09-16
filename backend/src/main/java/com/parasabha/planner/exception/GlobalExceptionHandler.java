@@ -26,7 +26,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(fe -> fieldErrors.put(fe.getField(), fe.getDefaultMessage()));
-        Map<String, Object> body = body(HttpStatus.BAD_REQUEST, "Validation failed");
+        // Surface the first specific validation message (e.g. "P1 and P2 are required...") so
+        // callers relying on the top-level "message" field see something actionable, falling
+        // back to a generic message only when no field-level detail is available.
+        String message = fieldErrors.values().stream().findFirst().orElse("Validation failed");
+        Map<String, Object> body = body(HttpStatus.BAD_REQUEST, message);
         body.put("fieldErrors", fieldErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }

@@ -52,36 +52,62 @@ public class ScheduleService {
      * Weekly grid for the week starting at {@code weekStart} (a Monday). Swamis shown for
      * each entry are ONLY those explicitly planned (via SwamiVisit) for that entry's exact
      * date within this week - entries with no plan for this week show no Swamis at all.
+     * PRS entries (no fixed weekday) never get their own group here: they only appear once a
+     * visit is planned, and are shown under whichever Mon-Sat day was chosen for that visit.
      */
     @Transactional(readOnly = true)
     public List<WeeklyScheduleDayDto> weeklyGrid(LocalDate weekStart) {
-        List<ScheduleEntry> all = scheduleEntryRepository.findAllByOrderBySortOrderAsc();
+        List<ScheduleEntry> sorted = scheduleEntryRepository.findAllByOrderBySortOrderAsc().stream()
+                .sorted(Comparator.comparing(ScheduleEntry::getSortOrder))
+                .toList();
 
         LocalDate weekEnd = WeekUtil.weekEnd(weekStart);
         List<SwamiVisit> visits = swamiVisitRepository.findByVisitDateBetween(weekStart, weekEnd);
 
-        // Key: scheduleEntryId + exact date -> ordered list of swami DTOs for that visit.
-        Map<String, List<SwamiDto>> visitsByEntryAndDate = new HashMap<>();
+        // Key: scheduleEntryId -> that entry's visit for this week (at most one, by design).
+        Map<Long, SwamiVisit> visitsByEntryId = new HashMap<>();
         for (SwamiVisit visit : visits) {
-            String key = visitKey(visit.getScheduleEntry().getId(), visit.getVisitDate());
-            visitsByEntryAndDate.put(key, toSwamiDtos(visit));
+            visitsByEntryId.put(visit.getScheduleEntry().getId(), visit);
         }
 
         Map<Weekday, List<ScheduleEntryDto>> grouped = new LinkedHashMap<>();
         for (Weekday weekday : Weekday.values()) {
             grouped.put(weekday, new ArrayList<>());
         }
-        all.stream()
-                .sorted(Comparator.comparing(ScheduleEntry::getSortOrder))
-                .forEach(entry -> {
-                    LocalDate expectedDate = WeekUtil.expectedDate(weekStart, entry.getWeekday());
-                    List<SwamiDto> swamis = visitsByEntryAndDate.getOrDefault(
-                            visitKey(entry.getId(), expectedDate), List.of());
-                    grouped.get(entry.getWeekday()).add(toDto(entry, swamis));
-                });
+
+        // Regular entries keep their fixed weekday slot.
+        for (ScheduleEntry entry : sorted) {
+            if (entry.getWeekday() == Weekday.PRS) {
+                continue;
+            }
+            SwamiVisit visit = visitsByEntryId.get(entry.getId());
+            List<SwamiDto> swamis = visit != null ? toSwamiDtos(visit) : List.of();
+            String vehicleArrangement = visit != null ? visit.getVehicleArrangement() : null;
+            grouped.get(entry.getWeekday()).add(toDto(entry, swamis, vehicleArrangement));
+        }
+
+        // PRS entries only show up this week if a visit was actually planned, under whichever
+        // weekday was chosen for that visit.
+        for (ScheduleEntry entry : sorted) {
+            if (entry.getWeekday() != Weekday.PRS) {
+                continue;
+            }
+            SwamiVisit visit = visitsByEntryId.get(entry.getId());
+            if (visit == null) {
+                continue;
+            }
+            Weekday effectiveWeekday = WeekUtil.weekdayForDate(weekStart, visit.getVisitDate());
+            if (effectiveWeekday == null) {
+                continue;
+            }
+            grouped.get(effectiveWeekday).add(toDto(entry, toSwamiDtos(visit), visit.getVehicleArrangement()));
+        }
 
         List<WeeklyScheduleDayDto> result = new ArrayList<>();
         for (Weekday weekday : Weekday.values()) {
+            if (weekday == Weekday.PRS) {
+                continue;
+            }
             result.add(WeeklyScheduleDayDto.builder()
                     .weekday(weekday)
                     .weekdayLabel(weekday.getDisplayName())
@@ -140,10 +166,6 @@ public class ScheduleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule entry not found with id " + id));
     }
 
-    private static String visitKey(Long scheduleEntryId, LocalDate date) {
-        return scheduleEntryId + "|" + date;
-    }
-
     private static List<SwamiDto> toSwamiDtos(SwamiVisit visit) {
         List<SwamiDto> swamis = new ArrayList<>();
         visit.getAssignments().forEach(a -> swamis.add(SwamiDto.builder()
@@ -154,6 +176,10 @@ public class ScheduleService {
     }
 
     private ScheduleEntryDto toDto(ScheduleEntry entry, List<SwamiDto> swamis) {
+        return toDto(entry, swamis, null);
+    }
+
+    private ScheduleEntryDto toDto(ScheduleEntry entry, List<SwamiDto> swamis, String vehicleArrangement) {
         return ScheduleEntryDto.builder()
                 .id(entry.getId())
                 .weekday(entry.getWeekday())
@@ -163,6 +189,7 @@ public class ScheduleService {
                 .mandalName(entry.getMandal().getName())
                 .mandalPr(entry.getMandal().isPr())
                 .swamis(swamis)
+                .vehicleArrangement(vehicleArrangement)
                 .build();
     }
 }

@@ -82,13 +82,24 @@
                       @if (entry.mandalPr) {
                         <span class="pr-badge">PR</span>
                       }
+                      @if (entry.weekday === 'PRS') {
+                        <span class="prs-badge">PRS</span>
+                      }
                     </div>
                     @if (entry.swamis.length > 0) {
                       <mat-chip-set class="swami-chips">
-                        @for (swami of entry.swamis; track swami.id) {
-                          <mat-chip>{{ swami.name }}</mat-chip>
+                        @for (swami of entry.swamis; track swami.id; let i = $index) {
+                          <mat-chip>
+                            @if (swamiRole(entry, i); as role) {
+                              <strong class="swami-role-tag">{{ role }}:</strong>
+                            }
+                            {{ swami.name }}
+                          </mat-chip>
                         }
                       </mat-chip-set>
+                    }
+                    @if (entry.vehicleArrangement) {
+                      <div class="vehicle-note">વાહન : {{ entry.vehicleArrangement }}</div>
                     }
                   </li>
                 }

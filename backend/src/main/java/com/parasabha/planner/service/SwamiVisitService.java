@@ -4,6 +4,7 @@ import com.parasabha.planner.domain.ScheduleEntry;
 import com.parasabha.planner.domain.Swami;
 import com.parasabha.planner.domain.SwamiVisit;
 import com.parasabha.planner.domain.SwamiVisitAssignment;
+import com.parasabha.planner.domain.Weekday;
 import com.parasabha.planner.dto.SwamiDto;
 import com.parasabha.planner.dto.SwamiVisitDto;
 import com.parasabha.planner.dto.SwamiVisitRequest;
@@ -15,6 +16,7 @@ import com.parasabha.planner.util.WeekUtil;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,21 +43,26 @@ public class SwamiVisitService {
                 .toList();
     }
 
-    /** Creates a new visit, or updates the existing one if this entry already has a plan for that date. */
+    /**
+     * Creates a new visit, or updates the existing one if this entry already has a plan for
+     * that date. For PRS entries (whose display day is chosen per-visit rather than fixed), the
+     * lookup instead matches any existing visit for this entry within the same week as the
+     * requested date, so changing the chosen day moves the existing plan instead of duplicating it.
+     */
     public SwamiVisitDto upsert(SwamiVisitRequest request) {
         ScheduleEntry scheduleEntry = scheduleEntryRepository.findById(request.getScheduleEntryId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Schedule entry not found with id " + request.getScheduleEntryId()));
 
-        SwamiVisit visit = swamiVisitRepository
-                .findByScheduleEntry_IdAndVisitDate(request.getScheduleEntryId(), request.getVisitDate())
+        SwamiVisit visit = findExistingVisit(scheduleEntry, request.getVisitDate())
                 .orElseGet(() -> SwamiVisit.builder()
                         .scheduleEntry(scheduleEntry)
-                        .visitDate(request.getVisitDate())
                         .build());
+        visit.setVisitDate(request.getVisitDate());
 
         visit.getAssignments().clear();
         applySwamis(visit, request.getSwamiIds());
+        visit.setVehicleArrangement(normalizeVehicleArrangement(request.getVehicleArrangement()));
 
         return toDto(swamiVisitRepository.save(visit));
     }
@@ -67,6 +74,7 @@ public class SwamiVisitService {
         }
         visit.getAssignments().clear();
         applySwamis(visit, request.getSwamiIds());
+        visit.setVehicleArrangement(normalizeVehicleArrangement(request.getVehicleArrangement()));
         return toDto(visit);
     }
 
@@ -93,6 +101,29 @@ public class SwamiVisitService {
         }
     }
 
+    private String normalizeVehicleArrangement(String vehicleArrangement) {
+        if (vehicleArrangement == null) {
+            return null;
+        }
+        String trimmed = vehicleArrangement.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /**
+     * For PRS entries, the chosen display day (and therefore the exact visit date) can change
+     * between saves, so we look up any existing visit within that date's week rather than an
+     * exact date match - otherwise changing the day would leave a stale duplicate behind.
+     */
+    private Optional<SwamiVisit> findExistingVisit(ScheduleEntry scheduleEntry, LocalDate visitDate) {
+        if (scheduleEntry.getWeekday() == Weekday.PRS) {
+            LocalDate weekStart = WeekUtil.mondayOf(visitDate);
+            LocalDate weekEnd = WeekUtil.weekEnd(weekStart);
+            return swamiVisitRepository.findFirstByScheduleEntry_IdAndVisitDateBetween(
+                    scheduleEntry.getId(), weekStart, weekEnd);
+        }
+        return swamiVisitRepository.findByScheduleEntry_IdAndVisitDate(scheduleEntry.getId(), visitDate);
+    }
+
     private SwamiVisit getOrThrow(Long id) {
         return swamiVisitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Swami visit not found with id " + id));
@@ -114,6 +145,7 @@ public class SwamiVisitService {
                 .mandalName(entry.getMandal().getName())
                 .mandalPr(entry.getMandal().isPr())
                 .swamis(swamis)
+                .vehicleArrangement(visit.getVehicleArrangement())
                 .build();
     }
 }

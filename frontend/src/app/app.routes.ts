@@ -15,6 +15,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/mandals/mandals').then((m) => m.MandalsComponent)
   },
   {
+    path: 'mandal-schedule',
+    loadComponent: () =>
+      import('./features/mandal-schedule/mandal-schedule').then((m) => m.MandalScheduleComponent)
+  },
+  {
     path: 'swamis',
     loadComponent: () => import('./features/swamis/swamis').then((m) => m.SwamisComponent)
   },

@@ -39,6 +39,24 @@ export function expectedDateFor(weekStart: Date, weekday: Weekday): Date {
   return dateForWeekday(weekStart, weekday) ?? weekStart;
 }
 
+/**
+ * Inverse of dateForWeekday: which MONDAY..SATURDAY weekday a date falls on within the week
+ * starting weekStart. Returns null if the date isn't a Mon-Sat day within that week (mirrors
+ * the backend's WeekUtil.weekdayForDate). Used to figure out which day a PRS visit was
+ * planned for, since PRS entries don't have a fixed weekday of their own.
+ */
+export function weekdayForDate(weekStart: Date, date: Date): Weekday | null {
+  const diffDays = Math.round((date.getTime() - weekStart.getTime()) / (24 * 60 * 60 * 1000));
+  const entry = Object.entries(WEEKDAY_OFFSET).find(([, offset]) => offset === diffDays);
+  return (entry?.[0] as Weekday | undefined) ?? null;
+}
+
+/** Parses an ISO yyyy-MM-dd string (as returned by the API) into a local Date at midnight. */
+export function fromIsoDate(iso: string): Date {
+  const [year, month, day] = iso.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 const RANGE_FORMATTER = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' });
 const RANGE_FORMATTER_WITH_YEAR = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 const DAY_FORMATTER = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' });

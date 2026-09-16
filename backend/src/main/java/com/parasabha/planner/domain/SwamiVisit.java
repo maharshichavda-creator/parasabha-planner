@@ -51,4 +51,8 @@ public class SwamiVisit {
     @OrderBy("sequence ASC")
     @Builder.Default
     private List<SwamiVisitAssignment> assignments = new ArrayList<>();
+
+    /** Free-text vehicle arrangement (વાહન વ્યવસ્થા) note for this visit - optional. */
+    @Column(name = "vehicle_arrangement")
+    private String vehicleArrangement;
 }

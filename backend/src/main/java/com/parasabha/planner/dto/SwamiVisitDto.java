@@ -27,4 +27,7 @@ public class SwamiVisitDto {
     private boolean mandalPr;
 
     private List<SwamiDto> swamis;
+
+    /** Free-text vehicle arrangement (વાહન વ્યવસ્થા) note for this visit - optional. */
+    private String vehicleArrangement;
 }
