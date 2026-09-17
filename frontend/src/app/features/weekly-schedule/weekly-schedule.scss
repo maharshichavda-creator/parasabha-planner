@@ -10,56 +10,62 @@
   }
 }
 
-.download-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  mat-spinner {
-    display: inline-block;
-  }
+.topic-section {
+  margin-bottom: 16px;
+  background: #fff8e1;
 }
 
-.print-area {
-  background: #fff;
+.topic-heading {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.75);
 }
 
-.pdf-header {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 12px;
-
-  .pdf-logo {
-    height: 64px;
-    width: auto;
-    margin-bottom: 6px;
-  }
-
-  .pdf-header-text {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: rgba(0, 0, 0, 0.85);
-  }
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
 }
 
-.print-title {
+.topic-item {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 
-  h2 {
-    margin: 0;
-    font-size: 1.2rem;
-  }
+.topic-role {
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.7);
+}
 
-  .week-range {
-    font-size: 1rem;
-    color: rgba(0, 0, 0, 0.6);
+.topic-text {
+  &.blank {
+    color: rgba(0, 0, 0, 0.4);
+    font-style: italic;
   }
 }
+
+.topic-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: #1565c0;
+  text-decoration: none;
+
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 
 .state-row {
   display: flex;
@@ -119,83 +125,6 @@
 
 .day-card {
   height: 100%;
-}
-
-.print-area.pdf-capturing {
-  padding: 8px 16px;
-
-  .pdf-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 12px;
-    white-space: nowrap;
-  }
-
-  .pdf-header .pdf-logo {
-    height: 56px;
-    margin-bottom: 0;
-  }
-
-  .pdf-header .pdf-header-text {
-    font-size: 1rem;
-    white-space: nowrap;
-  }
-
-  .print-title h2 {
-    font-size: 1.05rem;
-  }
-
-  // Fixed 4-column grid keeps all 7 day cards on a single, tidy row pair
-  // instead of stacking narrowly and pushing content onto a second page.
-  .week-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-
-  .day-card {
-    box-shadow: none;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-
-    ::ng-deep .mat-mdc-card-header {
-      padding: 8px 10px 0;
-    }
-
-    ::ng-deep .mat-mdc-card-content {
-      padding: 4px 10px 8px;
-    }
-
-    ::ng-deep .mat-mdc-card-title {
-      font-size: 0.95rem;
-    }
-
-    ::ng-deep .mat-mdc-card-subtitle {
-      font-size: 0.75rem;
-      margin-bottom: 4px;
-    }
-  }
-
-  .mandal-list {
-    gap: 6px;
-  }
-
-  .mandal-item {
-    padding-bottom: 4px;
-  }
-
-  .mandal-name {
-    font-size: 0.85rem;
-  }
-
-  .swami-chips {
-    margin-top: 2px;
-
-    ::ng-deep .mat-mdc-chip {
-      min-height: 22px;
-      font-size: 0.7rem;
-      padding: 0 8px;
-    }
-  }
 }
 
 .empty-day {

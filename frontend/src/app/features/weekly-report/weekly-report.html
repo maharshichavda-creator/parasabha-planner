@@ -1,0 +1,149 @@
+<h1><mat-icon>description</mat-icon> PDF રિપોર્ટ</h1>
+
+<p class="hint">
+  Pick any date to generate a printable weekly report for that Mon–Sat week - including the
+  પ્રવચન વિષય and a full day-wise Sant Mandal / Mandal / વાહન breakdown - and download it as a
+  lightweight PDF.
+</p>
+
+<div class="week-nav">
+  <button mat-icon-button (click)="previousWeek()" aria-label="Previous week">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <div class="week-nav-label">
+    <span class="week-range">{{ weekRangeLabel() }}</span>
+    @if (isCurrentWeek()) {
+      <span class="current-week-badge">This week</span>
+    }
+  </div>
+
+  <button mat-icon-button (click)="nextWeek()" aria-label="Next week">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+
+  @if (!isCurrentWeek()) {
+    <button mat-stroked-button class="today-btn" (click)="goToCurrentWeek()">Today</button>
+  }
+
+  <mat-form-field appearance="outline" class="date-picker">
+    <mat-label>Jump to date</mat-label>
+    <input matInput type="date" [ngModel]="startDateIso()" (ngModelChange)="onDatePicked($event)" />
+  </mat-form-field>
+
+  <button
+    mat-flat-button
+    color="primary"
+    class="download-btn"
+    (click)="downloadPdf()"
+    [disabled]="loading() || !!error() || downloadingPdf()"
+  >
+    @if (downloadingPdf()) {
+      <mat-spinner diameter="18"></mat-spinner>
+    } @else {
+      <mat-icon>picture_as_pdf</mat-icon>
+    }
+    Download PDF
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="state-row">
+    <mat-spinner diameter="32"></mat-spinner>
+    <span>Loading report...</span>
+  </div>
+} @else if (error()) {
+  <div class="state-row error">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error() }}</span>
+  </div>
+} @else {
+  <div class="report-wrapper">
+    <div #reportSheet class="report-sheet">
+      <div class="letterhead">
+        <img src="assets/Aksharderi.png" alt="Aksharderi" class="letterhead-logo" />
+        <div class="letterhead-title">BAPS શ્રી સ્વામિનારાયણ મંદિર, પુણે</div>
+      </div>
+
+      <div class="report-title">
+        <h2>પરાસભા - સાપ્તાહિક આયોજન</h2>
+        <div class="report-range">{{ weekRangeLabel() }}</div>
+      </div>
+
+      @if (hasTopic()) {
+        <div class="topic-block">
+          <div class="topic-block-title">પ્રવચન વિષય</div>
+          <div class="topic-block-grid">
+            <div class="topic-block-item">
+              <div class="topic-block-label">P1</div>
+              <div class="topic-block-value">{{ topic()?.p1Topic || '—' }}</div>
+              @if (topic()?.p1Link) {
+                <div class="topic-block-link">{{ topic()?.p1Link }}</div>
+              }
+            </div>
+            <div class="topic-block-item">
+              <div class="topic-block-label">P2</div>
+              <div class="topic-block-value">{{ topic()?.p2Topic || '—' }}</div>
+              @if (topic()?.p2Link) {
+                <div class="topic-block-link">{{ topic()?.p2Link }}</div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th class="col-day">Day / Date</th>
+            <th class="col-mandal">Mandal</th>
+            <th class="col-p">P1</th>
+            <th class="col-p">P2</th>
+            <th class="col-vehicle">વાહન</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (day of days(); track day.weekday) {
+            @if (day.entries.length === 0) {
+              <tr class="day-row-start">
+                <td class="day-cell">
+                  <div class="day-name">{{ day.weekdayLabel }}</div>
+                  <div class="day-date">{{ dateLabelFor(day) }}</div>
+                </td>
+                <td colspan="4" class="empty-cell">No mandals assigned yet.</td>
+              </tr>
+            } @else {
+              @for (entry of day.entries; track entry.id; let i = $index) {
+                <tr [class.day-row-start]="i === 0">
+                  @if (i === 0) {
+                    <td class="day-cell" [attr.rowspan]="day.entries.length">
+                      <div class="day-name">{{ day.weekdayLabel }}</div>
+                      <div class="day-date">{{ dateLabelFor(day) }}</div>
+                    </td>
+                  }
+                  <td class="mandal-cell">
+                    {{ entry.mandalName }}
+                    @if (entry.mandalPr) {
+                      <span class="badge pr">PR</span>
+                    }
+                    @if (entry.weekday === 'PRS') {
+                      <span class="badge prs">PRS</span>
+                    }
+                    @if (additionalNames(entry); as extra) {
+                      <div class="extra-santo">+ {{ extra }}</div>
+                    }
+                  </td>
+                  <td>{{ p1Name(entry) || '—' }}</td>
+                  <td>{{ p2Name(entry) || '—' }}</td>
+                  <td>{{ entry.vehicleArrangement || '—' }}</td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+
+      <div class="report-footer">Generated from Parasabha Planner</div>
+    </div>
+  </div>
+}

@@ -13,6 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ScheduleService } from '../../core/services/schedule.service';
 import { SwamiService } from '../../core/services/swami.service';
 import { SwamiVisitService } from '../../core/services/swami-visit.service';
+import { WeeklyTopicService } from '../../core/services/weekly-topic.service';
 import { ScheduleEntry, Swami, SwamiVisit, Weekday, WEEKDAY_LABELS, WEEKDAY_ORDER } from '../../core/models';
 import {
   addDays,
@@ -52,6 +53,7 @@ export class PlanVisitsComponent {
   private readonly scheduleService = inject(ScheduleService);
   private readonly swamiService = inject(SwamiService);
   private readonly swamiVisitService = inject(SwamiVisitService);
+  private readonly weeklyTopicService = inject(WeeklyTopicService);
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
 
@@ -91,6 +93,16 @@ export class PlanVisitsComponent {
   readonly selectedEntryId = signal<number | null>(null);
   readonly selectedEntry = computed(() => this.entries().find((e) => e.id === this.selectedEntryId()) ?? null);
   readonly isPrsEntrySelected = computed(() => this.selectedEntry()?.weekday === 'PRS');
+
+  /** P1/P2 પ્રવચન વિષય (discourse topic) + link plan for the current week - one record per week. */
+  readonly topicForm = this.fb.nonNullable.group({
+    p1Topic: [''],
+    p1Link: [''],
+    p2Topic: [''],
+    p2Link: ['']
+  });
+  readonly loadingTopic = signal(true);
+  readonly savingTopic = signal(false);
 
   readonly rows = computed<RowViewModel[]>(() => {
     const weekStart = this.weekStart();
@@ -138,6 +150,7 @@ export class PlanVisitsComponent {
   constructor() {
     this.loadStaticData();
     this.loadVisits();
+    this.loadTopic();
     this.form.controls.scheduleEntryId.valueChanges.subscribe((id) => this.selectedEntryId.set(id));
   }
 
@@ -160,22 +173,67 @@ export class PlanVisitsComponent {
     });
   }
 
+  loadTopic(): void {
+    this.loadingTopic.set(true);
+    this.weeklyTopicService.getForWeek(toIsoDate(this.weekStart())).subscribe({
+      next: (topic) => {
+        this.topicForm.reset({
+          p1Topic: topic.p1Topic ?? '',
+          p1Link: topic.p1Link ?? '',
+          p2Topic: topic.p2Topic ?? '',
+          p2Link: topic.p2Link ?? ''
+        });
+        this.loadingTopic.set(false);
+      },
+      error: () => {
+        this.snackBar.open('Failed to load પ્રવચન વિષય for this week', 'Dismiss', { duration: 4000 });
+        this.loadingTopic.set(false);
+      }
+    });
+  }
+
+  saveTopic(): void {
+    const value = this.topicForm.getRawValue();
+    this.savingTopic.set(true);
+    this.weeklyTopicService
+      .upsert({
+        weekStart: toIsoDate(this.weekStart()),
+        p1Topic: value.p1Topic.trim() || undefined,
+        p1Link: value.p1Link.trim() || undefined,
+        p2Topic: value.p2Topic.trim() || undefined,
+        p2Link: value.p2Link.trim() || undefined
+      })
+      .subscribe({
+        next: () => {
+          this.snackBar.open('પ્રવચન વિષય saved', 'Dismiss', { duration: 3000 });
+          this.savingTopic.set(false);
+        },
+        error: (err) => {
+          this.snackBar.open(err?.error?.message ?? 'Could not save પ્રવચન વિષય', 'Dismiss', { duration: 4000 });
+          this.savingTopic.set(false);
+        }
+      });
+  }
+
   previousWeek(): void {
     this.weekOffset.update((offset) => offset - 1);
     this.cancelEdit();
     this.loadVisits();
+    this.loadTopic();
   }
 
   nextWeek(): void {
     this.weekOffset.update((offset) => offset + 1);
     this.cancelEdit();
     this.loadVisits();
+    this.loadTopic();
   }
 
   goToCurrentWeek(): void {
     this.weekOffset.set(0);
     this.cancelEdit();
     this.loadVisits();
+    this.loadTopic();
   }
 
   onAdditionalSelectionChange(event: MatSelectChange): void {

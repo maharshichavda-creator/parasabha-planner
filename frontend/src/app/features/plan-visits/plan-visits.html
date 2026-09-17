@@ -27,6 +27,49 @@
   }
 </div>
 
+<mat-card class="form-card topic-card">
+  <mat-card-header>
+    <mat-card-title>પ્રવચન વિષય (P1 / P2)</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (loadingTopic()) {
+      <p>Loading પ્રવચન વિષય...</p>
+    } @else {
+      <form [formGroup]="topicForm" (ngSubmit)="saveTopic()" class="visit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>P1 પ્રવચન વિષય</mat-label>
+            <input matInput formControlName="p1Topic" placeholder="વિષય લખો" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>P1 લિંક</mat-label>
+            <input matInput formControlName="p1Link" placeholder="https://..." />
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>P2 પ્રવચન વિષય</mat-label>
+            <input matInput formControlName="p2Topic" placeholder="વિષય લખો" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>P2 લિંક</mat-label>
+            <input matInput formControlName="p2Link" placeholder="https://..." />
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="savingTopic()">
+            {{ savingTopic() ? 'Saving...' : 'Save Topic' }}
+          </button>
+        </div>
+      </form>
+    }
+  </mat-card-content>
+</mat-card>
+
 <mat-card class="form-card">
   <mat-card-content>
     <form [formGroup]="form" (ngSubmit)="submit()" class="visit-form">

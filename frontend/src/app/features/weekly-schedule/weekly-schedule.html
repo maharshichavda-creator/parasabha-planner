@@ -1,20 +1,5 @@
 <div class="page-header">
   <h1><mat-icon>calendar_month</mat-icon> પરાસભા - સાપ્તાહિક આયોજન</h1>
-
-  <button
-    mat-flat-button
-    color="primary"
-    class="download-btn"
-    (click)="downloadPdf()"
-    [disabled]="loading() || !!error() || downloadingPdf()"
-  >
-    @if (downloadingPdf()) {
-      <mat-spinner diameter="18"></mat-spinner>
-    } @else {
-      <mat-icon>picture_as_pdf</mat-icon>
-    }
-    Download PDF
-  </button>
 </div>
 
 <div class="week-nav">
@@ -49,16 +34,42 @@
     <span>{{ error() }}</span>
   </div>
 } @else {
-  <div #printArea class="print-area">
-    <div class="pdf-header">
-      <img src="assets/Aksharderi.png" alt="Aksharderi" class="pdf-logo" />
-      <span class="pdf-header-text">BAPS શ્રી સ્વામિનારાયણ મંદિર, પુણે</span>
-    </div>
-    <div class="print-title">
-      <h2>પરાસભા - સાપ્તાહિક આયોજન</h2>
-      <span class="week-range">{{ weekRangeLabel() }}</span>
-    </div>
-    <div class="week-grid">
+  @if (hasTopic()) {
+    <mat-card class="topic-section">
+      <mat-card-content>
+        <h3 class="topic-heading">પ્રવચન વિષય</h3>
+        <div class="topic-grid">
+          <div class="topic-item">
+            <span class="topic-role">P1:</span>
+            @if (topic()?.p1Topic) {
+              <span class="topic-text">{{ topic()?.p1Topic }}</span>
+            } @else {
+              <span class="topic-text blank">—</span>
+            }
+            @if (topic()?.p1Link) {
+              <a [href]="topic()?.p1Link" target="_blank" rel="noopener" class="topic-link">
+                <mat-icon inline="true">link</mat-icon> Link
+              </a>
+            }
+          </div>
+          <div class="topic-item">
+            <span class="topic-role">P2:</span>
+            @if (topic()?.p2Topic) {
+              <span class="topic-text">{{ topic()?.p2Topic }}</span>
+            } @else {
+              <span class="topic-text blank">—</span>
+            }
+            @if (topic()?.p2Link) {
+              <a [href]="topic()?.p2Link" target="_blank" rel="noopener" class="topic-link">
+                <mat-icon inline="true">link</mat-icon> Link
+              </a>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+  <div class="week-grid">
       @for (day of days(); track day.weekday) {
         <mat-card class="day-card">
           <mat-card-header>
@@ -109,5 +120,4 @@
         </mat-card>
       }
     </div>
-  </div>
 }

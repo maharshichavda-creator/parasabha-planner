@@ -3,8 +3,16 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   { path: '', redirectTo: 'weekly', pathMatch: 'full' },
   {
+    path: 'dashboard',
+    loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.DashboardComponent)
+  },
+  {
     path: 'weekly',
     loadComponent: () => import('./features/weekly-schedule/weekly-schedule').then((m) => m.WeeklyScheduleComponent)
+  },
+  {
+    path: 'report',
+    loadComponent: () => import('./features/weekly-report/weekly-report').then((m) => m.WeeklyReportComponent)
   },
   {
     path: 'plan-visits',
