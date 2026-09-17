@@ -78,14 +78,30 @@
               <div class="topic-block-label">P1</div>
               <div class="topic-block-value">{{ topic()?.p1Topic || '—' }}</div>
               @if (topic()?.p1Link) {
-                <div class="topic-block-link">{{ topic()?.p1Link }}</div>
+                <a
+                  #p1LinkAnchor
+                  class="topic-block-link"
+                  [href]="topic()?.p1Link"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <mat-icon inline="true">link</mat-icon> Link
+                </a>
               }
             </div>
             <div class="topic-block-item">
               <div class="topic-block-label">P2</div>
               <div class="topic-block-value">{{ topic()?.p2Topic || '—' }}</div>
               @if (topic()?.p2Link) {
-                <div class="topic-block-link">{{ topic()?.p2Link }}</div>
+                <a
+                  #p2LinkAnchor
+                  class="topic-block-link"
+                  [href]="topic()?.p2Link"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <mat-icon inline="true">link</mat-icon> Link
+                </a>
               }
             </div>
           </div>

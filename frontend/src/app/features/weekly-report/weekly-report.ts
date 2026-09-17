@@ -32,6 +32,8 @@ export class WeeklyReportComponent {
   private readonly weeklyTopicService = inject(WeeklyTopicService);
 
   readonly reportSheet = viewChild<ElementRef<HTMLElement>>('reportSheet');
+  readonly p1LinkAnchor = viewChild<ElementRef<HTMLAnchorElement>>('p1LinkAnchor');
+  readonly p2LinkAnchor = viewChild<ElementRef<HTMLAnchorElement>>('p2LinkAnchor');
 
   readonly days = signal<WeeklyScheduleDay[]>([]);
   readonly topic = signal<WeeklyTopic | null>(null);
@@ -135,11 +137,34 @@ export class WeeklyReportComponent {
     this.downloadingPdf.set(true);
     element.classList.add('pdf-capturing');
     try {
+      // Rasterizing the sheet into an image (below) loses the P1/P2 "Link" anchors' clickable
+      // behaviour, so capture their on-screen positions first (in un-scaled canvas px, relative
+      // to the sheet's top-left corner) and re-attach them as real PDF link annotations afterwards.
+      const captureScale = 2;
+      const sheetRect = element.getBoundingClientRect();
+      const linkTargets: { url: string; canvasRect: { x: number; y: number; width: number; height: number } }[] = [];
+      const collectLinkTarget = (anchor: ElementRef<HTMLAnchorElement> | undefined, url: string | null | undefined): void => {
+        const anchorEl = anchor?.nativeElement;
+        if (!anchorEl || !url) return;
+        const r = anchorEl.getBoundingClientRect();
+        linkTargets.push({
+          url,
+          canvasRect: {
+            x: (r.left - sheetRect.left) * captureScale,
+            y: (r.top - sheetRect.top) * captureScale,
+            width: r.width * captureScale,
+            height: r.height * captureScale
+          }
+        });
+      };
+      collectLinkTarget(this.p1LinkAnchor(), this.topic()?.p1Link);
+      collectLinkTarget(this.p2LinkAnchor(), this.topic()?.p2Link);
+
       // Lazy-loaded so these libraries don't add to the initial app bundle.
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: captureScale,
         backgroundColor: '#ffffff',
         useCORS: true
       });
@@ -179,6 +204,23 @@ export class WeeklyReportComponent {
           pdf.addPage();
         }
         pdf.addImage(imageData, 'JPEG', margin, margin, usableWidth, sliceHeightPx * scaleFactor);
+
+        // Re-attach any topic links that fall within this page's slice as clickable annotations,
+        // positioned over the exact spot where the rasterized "Link" text was drawn.
+        const sliceStartPx = renderedHeightPx;
+        const sliceEndPx = renderedHeightPx + sliceHeightPx;
+        for (const target of linkTargets) {
+          if (target.canvasRect.y + target.canvasRect.height <= sliceStartPx || target.canvasRect.y >= sliceEndPx) {
+            continue;
+          }
+          pdf.link(
+            margin + target.canvasRect.x * scaleFactor,
+            margin + (target.canvasRect.y - sliceStartPx) * scaleFactor,
+            target.canvasRect.width * scaleFactor,
+            target.canvasRect.height * scaleFactor,
+            { url: target.url }
+          );
+        }
 
         renderedHeightPx += sliceHeightPx;
         isFirstPage = false;
