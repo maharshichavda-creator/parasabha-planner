@@ -75,34 +75,38 @@
           <div class="topic-block-title">પ્રવચન વિષય</div>
           <div class="topic-block-grid">
             <div class="topic-block-item">
-              <div class="topic-block-label">P1</div>
+              <div class="topic-block-label-row">
+                <span class="topic-block-label">P1</span>
+                @if (topic()?.p1Link) {
+                  <a
+                    #p1LinkAnchor
+                    class="topic-block-link"
+                    [href]="topic()?.p1Link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <mat-icon inline="true">link</mat-icon> Link
+                  </a>
+                }
+              </div>
               <div class="topic-block-value">{{ topic()?.p1Topic || '—' }}</div>
-              @if (topic()?.p1Link) {
-                <a
-                  #p1LinkAnchor
-                  class="topic-block-link"
-                  [href]="topic()?.p1Link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <mat-icon inline="true">link</mat-icon> Link
-                </a>
-              }
             </div>
             <div class="topic-block-item">
-              <div class="topic-block-label">P2</div>
+              <div class="topic-block-label-row">
+                <span class="topic-block-label">P2</span>
+                @if (topic()?.p2Link) {
+                  <a
+                    #p2LinkAnchor
+                    class="topic-block-link"
+                    [href]="topic()?.p2Link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <mat-icon inline="true">link</mat-icon> Link
+                  </a>
+                }
+              </div>
               <div class="topic-block-value">{{ topic()?.p2Topic || '—' }}</div>
-              @if (topic()?.p2Link) {
-                <a
-                  #p2LinkAnchor
-                  class="topic-block-link"
-                  [href]="topic()?.p2Link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <mat-icon inline="true">link</mat-icon> Link
-                </a>
-              }
             </div>
           </div>
         </div>
