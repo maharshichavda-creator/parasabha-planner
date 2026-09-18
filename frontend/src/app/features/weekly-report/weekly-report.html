@@ -77,36 +77,36 @@
             <div class="topic-block-item">
               <div class="topic-block-label-row">
                 <span class="topic-block-label">P1</span>
-                @if (topic()?.p1Link) {
-                  <a
-                    #p1LinkAnchor
-                    class="topic-block-link"
-                    [href]="topic()?.p1Link"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    <mat-icon inline="true">link</mat-icon> Link
-                  </a>
-                }
+                <span class="topic-block-value">{{ topic()?.p1Topic || '—' }}</span>
               </div>
-              <div class="topic-block-value">{{ topic()?.p1Topic || '—' }}</div>
+              @if (topic()?.p1Link) {
+                <a
+                  #p1LinkAnchor
+                  class="topic-block-link"
+                  [href]="topic()?.p1Link"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <mat-icon inline="true">link</mat-icon> Link
+                </a>
+              }
             </div>
             <div class="topic-block-item">
               <div class="topic-block-label-row">
                 <span class="topic-block-label">P2</span>
-                @if (topic()?.p2Link) {
-                  <a
-                    #p2LinkAnchor
-                    class="topic-block-link"
-                    [href]="topic()?.p2Link"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    <mat-icon inline="true">link</mat-icon> Link
-                  </a>
-                }
+                <span class="topic-block-value">{{ topic()?.p2Topic || '—' }}</span>
               </div>
-              <div class="topic-block-value">{{ topic()?.p2Topic || '—' }}</div>
+              @if (topic()?.p2Link) {
+                <a
+                  #p2LinkAnchor
+                  class="topic-block-link"
+                  [href]="topic()?.p2Link"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <mat-icon inline="true">link</mat-icon> Link
+                </a>
+              }
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (day of days(); track day.weekday) {
+          @for (day of reportDays(); track day.weekday) {
             @if (day.entries.length === 0) {
               <tr class="day-row-start">
                 <td class="day-cell">

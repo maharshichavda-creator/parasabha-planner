@@ -55,6 +55,14 @@ export class WeeklyReportComponent {
     return !!t && !!(t.p1Topic || t.p1Link || t.p2Topic || t.p2Link);
   });
 
+  /** Report should only surface mandals that actually have a P1 and/or P2 Sant Mandal planned. */
+  readonly reportDays = computed(() =>
+    this.days().map((day) => ({
+      ...day,
+      entries: day.entries.filter((entry) => entry.swamis.length > 0)
+    }))
+  );
+
   constructor() {
     this.load();
   }

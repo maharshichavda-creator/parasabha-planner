@@ -85,8 +85,16 @@ h1 {
   max-width: 820px;
   background: #fff;
   padding: 36px 40px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
+  border-radius: 14px;
+  // A chunky "ridge" border auto-shades lighter/darker per edge for a beveled 3D look,
+  // while keeping a single base colour for a clean, consistent frame.
+  border-width: 10px;
+  border-style: ridge;
+  border-color: #d1c4e9;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.22),
+    0 6px 12px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
   &.pdf-capturing {
     box-shadow: none;
@@ -135,11 +143,17 @@ h1 {
 }
 
 .topic-block {
-  background: #fff8e1;
+  background: linear-gradient(145deg, #fffdf6, #fff1cc);
   border: 1px solid #ffe082;
-  border-radius: 6px;
-  padding: 14px 18px;
+  border-radius: 10px;
+  padding: 16px 20px;
   margin-bottom: 22px;
+  // Layered shadow (dark below/right + light highlight above/left) gives the card a raised,
+  // embossed "3D" feel instead of the previous flat panel.
+  box-shadow:
+    6px 6px 14px rgba(74, 20, 140, 0.18),
+    -4px -4px 10px rgba(255, 255, 255, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .topic-block-title {
@@ -147,12 +161,22 @@ h1 {
   font-weight: 700;
   color: rgba(0, 0, 0, 0.75);
   margin-bottom: 10px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .topic-block-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
+}
+
+.topic-block-item {
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow:
+    3px 3px 8px rgba(74, 20, 140, 0.12),
+    -2px -2px 6px rgba(255, 255, 255, 0.8);
 }
 
 .topic-block-label-row {
@@ -164,18 +188,21 @@ h1 {
 
 .topic-block-label {
   display: inline-block;
-  background: #6a1b9a;
+  background-color: #6a1b9a;
   color: #fff;
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 1px 8px;
-  border-radius: 3px;
+  padding: 2px 9px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
 }
 
 .topic-block-value {
   font-size: 0.92rem;
   font-weight: 500;
   color: #263238;
+  flex: 1;
+  word-break: break-word;
 }
 
 .topic-block-link {
@@ -186,6 +213,7 @@ h1 {
   font-weight: 600;
   color: #1565c0;
   text-decoration: none;
+  margin-top: 2px;
 
   mat-icon {
     font-size: 15px;
