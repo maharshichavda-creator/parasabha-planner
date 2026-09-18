@@ -126,12 +126,16 @@ public class ScheduleService {
                 .mandal(mandal)
                 .sortOrder(request.getSortOrder() != null ? request.getSortOrder() : nextSortOrder(request.getWeekday()))
                 .build();
+        entry = scheduleEntryRepository.save(entry);
 
-        return toDto(scheduleEntryRepository.save(entry), List.of());
+        syncMandalPrsFlag(mandal);
+
+        return toDto(entry, List.of());
     }
 
     public ScheduleEntryDto update(Long id, ScheduleEntryRequest request) {
         ScheduleEntry entry = getOrThrow(id);
+        Mandal previousMandal = entry.getMandal();
         Mandal mandal = mandalRepository.findById(request.getMandalId())
                 .orElseThrow(() -> new ResourceNotFoundException("Mandal not found with id " + request.getMandalId()));
 
@@ -141,17 +145,43 @@ public class ScheduleService {
             entry.setSortOrder(request.getSortOrder());
         }
 
+        syncMandalPrsFlag(mandal);
+        if (!previousMandal.getId().equals(mandal.getId())) {
+            syncMandalPrsFlag(previousMandal);
+        }
+
         return toDto(entry, List.of());
     }
 
     public void delete(Long id) {
-        if (!scheduleEntryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Schedule entry not found with id " + id);
-        }
+        ScheduleEntry entry = getOrThrow(id);
+        Mandal mandal = entry.getMandal();
         // Remove any planned swami visits for this entry first so the delete never fails on
         // the FK constraint.
         swamiVisitRepository.deleteAll(swamiVisitRepository.findByScheduleEntry_Id(id));
         scheduleEntryRepository.deleteById(id);
+
+        syncMandalPrsFlag(mandal);
+    }
+
+    /**
+     * Keeps {@link Mandal#isPrs()} consistent with whether the mandal exists purely for the
+     * PRS group - i.e. it has a PRS schedule entry but no regular (Mon-Sat) weekday of its own.
+     * A mandal that already has a regular/PR weekday slot (like a name reused across both a
+     * fixed weekday and the additional PRS group in the source schedule) keeps its primary
+     * "regular"/"PR" categorization on the Mandals screen even though it also shows up under
+     * PRS in the weekly plan - only mandals dedicated solely to the PRS group get tagged and
+     * moved into the PRS bucket there.
+     */
+    private void syncMandalPrsFlag(Mandal mandal) {
+        List<ScheduleEntry> entries = scheduleEntryRepository.findByMandal_Id(mandal.getId());
+        boolean hasPrsEntry = entries.stream().anyMatch(e -> e.getWeekday() == Weekday.PRS);
+        boolean hasNonPrsEntry = entries.stream().anyMatch(e -> e.getWeekday() != Weekday.PRS);
+        boolean shouldBePrs = hasPrsEntry && !hasNonPrsEntry;
+        if (mandal.isPrs() != shouldBePrs) {
+            mandal.setPrs(shouldBePrs);
+            mandalRepository.save(mandal);
+        }
     }
 
     private int nextSortOrder(Weekday weekday) {

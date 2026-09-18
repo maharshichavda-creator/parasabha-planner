@@ -36,22 +36,34 @@ export class MandalsComponent {
   readonly mandals = signal<Mandal[]>([]);
   readonly loading = signal(true);
   readonly editingId = signal<number | null>(null);
-  readonly displayedColumns = ['name', 'pr', 'actions'];
+  readonly displayedColumns = ['name', 'pr', 'prs', 'actions'];
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
-    pr: [false]
+    pr: [false],
+    prs: [false]
   });
 
   constructor() {
     this.load();
   }
 
+  /** Sort order for the mandal category: regular first, then PR, then PRS. */
+  private categoryRank(mandal: Mandal): number {
+    if (mandal.prs) return 2;
+    if (mandal.pr) return 1;
+    return 0;
+  }
+
   load(): void {
     this.loading.set(true);
     this.mandalService.list().subscribe({
       next: (mandals) => {
-        this.mandals.set([...mandals].sort((a, b) => a.name.localeCompare(b.name)));
+        this.mandals.set(
+          [...mandals].sort(
+            (a, b) => this.categoryRank(a) - this.categoryRank(b) || a.name.localeCompare(b.name)
+          )
+        );
         this.loading.set(false);
       },
       error: () => {
@@ -63,12 +75,12 @@ export class MandalsComponent {
 
   startEdit(mandal: Mandal): void {
     this.editingId.set(mandal.id ?? null);
-    this.form.setValue({ name: mandal.name, pr: mandal.pr });
+    this.form.setValue({ name: mandal.name, pr: mandal.pr, prs: mandal.prs });
   }
 
   cancelEdit(): void {
     this.editingId.set(null);
-    this.form.reset({ name: '', pr: false });
+    this.form.reset({ name: '', pr: false, prs: false });
   }
 
   submit(): void {

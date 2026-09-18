@@ -19,4 +19,6 @@ public class MandalDto {
     private String name;
 
     private boolean pr;
+
+    private boolean prs;
 }
