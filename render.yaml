@@ -37,7 +37,7 @@ services:
           property: password
       # Update this if Render assigns your frontend a different URL (e.g. due to a name clash).
       - key: CORS_ALLOWED_ORIGINS
-        value: https://parasabha-pune.onrender.com
+        value: https://parasabha-pune.com
 
   # --- Frontend: Angular static site ---
   - type: web
