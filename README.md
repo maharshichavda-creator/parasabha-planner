@@ -150,7 +150,7 @@ frontend (static site).
    **Apply**.
 5. Wait for all three resources to finish deploying (the backend build takes a few minutes
    the first time since it builds a Docker image with Maven).
-6. Open the frontend service's URL (e.g. `https://parasabha-pune.com`)
+6. Open the frontend service's URL (e.g. `https://parasabha-pune.onrender.com`)
    on your phone's browser — that's your app.
 
 **If Render assigns different service URLs than expected** (e.g. because
