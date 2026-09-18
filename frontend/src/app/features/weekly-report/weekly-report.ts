@@ -234,7 +234,7 @@ export class WeeklyReportComponent {
         isFirstPage = false;
       }
 
-      pdf.save(`parasabha-report-${this.startDateIso()}-to-${this.endDateIso()}.pdf`);
+      pdf.save(`parasabha-plan-${this.startDateIso()}-to-${this.endDateIso()}.pdf`);
     } finally {
       this.downloadingPdf.set(false);
       element.classList.remove('pdf-capturing');
