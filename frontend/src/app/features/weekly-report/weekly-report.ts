@@ -154,9 +154,11 @@ export class WeeklyReportComponent {
   }
 
   /**
-   * WhatsApp's wa.me links can only pre-fill a chat with text - they cannot attach a file for
-   * security/privacy reasons, so the PDF is downloaded first (same as "Download PDF") and the
-   * user is prompted to attach that just-downloaded file once the WhatsApp chat opens.
+   * Prefers the Web Share API with an actual file attachment (`navigator.share({ files })`),
+   * which on supported browsers/devices opens the OS share sheet - picking WhatsApp there
+   * attaches the PDF directly, no manual step needed. wa.me links alone can never do this
+   * (they can only pre-fill chat text, not attach a file), so that's kept only as a fallback
+   * for browsers where file sharing isn't available.
    */
   async shareOnWhatsApp(): Promise<void> {
     if (this.downloadingPdf() || this.sharingWhatsApp()) {
@@ -166,14 +168,32 @@ export class WeeklyReportComponent {
     try {
       const result = await this.generateReportPdf();
       if (!result) return;
-      result.pdf.save(result.fileName);
 
+      const message = `Parasabha - સાપ્તાહિક આયોજન (${this.weekRangeLabel()})`;
+      const file = new File([result.pdf.output('blob')], result.fileName, { type: 'application/pdf' });
+      const shareData: ShareData = { files: [file], title: 'Parasabha Planning', text: message };
+
+      if (navigator.canShare?.(shareData)) {
+        try {
+          await navigator.share(shareData);
+          return;
+        } catch (err) {
+          // User dismissed the OS share sheet - respect that instead of falling back to a download.
+          if ((err as DOMException)?.name === 'AbortError') {
+            return;
+          }
+          // Any other failure (e.g. share sheet had no compatible app) - fall through to the
+          // download + wa.me fallback below.
+        }
+      }
+
+      // Fallback for browsers without file-sharing support (most desktops): download the PDF
+      // and open a WhatsApp chat with pre-filled text so the user can attach it manually.
+      result.pdf.save(result.fileName);
       this.snackBar.open(`PDF downloaded as "${result.fileName}" - attach it in the WhatsApp chat that just opened.`, 'Dismiss', {
         duration: 6000
       });
-
-      const message = `Parasabha - સાપ્તાહિક આયોજન (${this.weekRangeLabel()})\nPDF attached: ${result.fileName}`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${message}\nPDF attached: ${result.fileName}`)}`, '_blank', 'noopener');
     } finally {
       this.sharingWhatsApp.set(false);
     }
