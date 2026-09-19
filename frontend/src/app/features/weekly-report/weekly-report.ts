@@ -207,6 +207,12 @@ export class WeeklyReportComponent {
 
     element.classList.add('pdf-capturing');
     try {
+      // Guard against html2canvas capturing a half-rendered sheet (e.g. the letterhead logo
+      // still loading, or the Roboto webfont not yet swapped in) - without this, a hasty click
+      // right after the report first renders can produce a capture with different layout/content
+      // than a later one, even though it's the exact same underlying report data.
+      await this.waitForRenderReady(element);
+
       // Rasterizing the sheet into an image (below) loses the P1/P2 "Link" anchors' clickable
       // behaviour, so capture their on-screen positions first (in un-scaled canvas px, relative
       // to the sheet's top-left corner) and re-attach them as real PDF link annotations afterwards.
@@ -300,5 +306,25 @@ export class WeeklyReportComponent {
     } finally {
       element.classList.remove('pdf-capturing');
     }
+  }
+
+  /** Resolves once all `<img>`s inside the sheet have finished loading and any pending webfonts are ready. */
+  private async waitForRenderReady(element: HTMLElement): Promise<void> {
+    const fontsReady = document.fonts?.ready ? document.fonts.ready.catch(() => undefined) : Promise.resolve();
+
+    const images = Array.from(element.querySelectorAll('img'));
+    const imagesReady = Promise.all(
+      images.map((img) => {
+        if (img.complete && img.naturalWidth > 0) {
+          return Promise.resolve();
+        }
+        return new Promise<void>((resolve) => {
+          img.addEventListener('load', () => resolve(), { once: true });
+          img.addEventListener('error', () => resolve(), { once: true });
+        });
+      })
+    );
+
+    await Promise.all([fontsReady, imagesReady]);
   }
 }
