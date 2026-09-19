@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import type { jsPDF } from 'jspdf';
 import { ScheduleService } from '../../core/services/schedule.service';
 import { WeeklyTopicService } from '../../core/services/weekly-topic.service';
 import { ScheduleEntry, WeeklyScheduleDay, WeeklyTopic } from '../../core/models';
@@ -30,6 +32,7 @@ import { addDays, dateForWeekday, formatDay, formatWeekRange, getMondayOf, toIso
 export class WeeklyReportComponent {
   private readonly scheduleService = inject(ScheduleService);
   private readonly weeklyTopicService = inject(WeeklyTopicService);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly reportSheet = viewChild<ElementRef<HTMLElement>>('reportSheet');
   readonly p1LinkAnchor = viewChild<ElementRef<HTMLAnchorElement>>('p1LinkAnchor');
@@ -40,6 +43,7 @@ export class WeeklyReportComponent {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly downloadingPdf = signal(false);
+  readonly sharingWhatsApp = signal(false);
 
   /** Number of weeks away from the current week (0 = this week, -1 = last week, 1 = next week, ...). */
   readonly weekOffset = signal(0);
@@ -137,12 +141,50 @@ export class WeeklyReportComponent {
   }
 
   async downloadPdf(): Promise<void> {
-    const element = this.reportSheet()?.nativeElement;
-    if (!element || this.downloadingPdf()) {
+    if (this.downloadingPdf() || this.sharingWhatsApp()) {
       return;
     }
-
     this.downloadingPdf.set(true);
+    try {
+      const result = await this.generateReportPdf();
+      result?.pdf.save(result.fileName);
+    } finally {
+      this.downloadingPdf.set(false);
+    }
+  }
+
+  /**
+   * WhatsApp's wa.me links can only pre-fill a chat with text - they cannot attach a file for
+   * security/privacy reasons, so the PDF is downloaded first (same as "Download PDF") and the
+   * user is prompted to attach that just-downloaded file once the WhatsApp chat opens.
+   */
+  async shareOnWhatsApp(): Promise<void> {
+    if (this.downloadingPdf() || this.sharingWhatsApp()) {
+      return;
+    }
+    this.sharingWhatsApp.set(true);
+    try {
+      const result = await this.generateReportPdf();
+      if (!result) return;
+      result.pdf.save(result.fileName);
+
+      this.snackBar.open(`PDF downloaded as "${result.fileName}" - attach it in the WhatsApp chat that just opened.`, 'Dismiss', {
+        duration: 6000
+      });
+
+      const message = `Parasabha - સાપ્તાહિક આયોજન (${this.weekRangeLabel()})\nPDF attached: ${result.fileName}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    } finally {
+      this.sharingWhatsApp.set(false);
+    }
+  }
+
+  private async generateReportPdf(): Promise<{ pdf: jsPDF; fileName: string } | null> {
+    const element = this.reportSheet()?.nativeElement;
+    if (!element) {
+      return null;
+    }
+
     element.classList.add('pdf-capturing');
     try {
       // Rasterizing the sheet into an image (below) loses the P1/P2 "Link" anchors' clickable
@@ -234,9 +276,8 @@ export class WeeklyReportComponent {
         isFirstPage = false;
       }
 
-      pdf.save(`parasabha-plan-${this.startDateIso()}-to-${this.endDateIso()}.pdf`);
+      return { pdf, fileName: `parasabha-plan-${this.startDateIso()}-to-${this.endDateIso()}.pdf` };
     } finally {
-      this.downloadingPdf.set(false);
       element.classList.remove('pdf-capturing');
     }
   }

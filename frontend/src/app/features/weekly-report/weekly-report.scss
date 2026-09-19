@@ -63,6 +63,31 @@ h1 {
   }
 }
 
+.whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #25d366;
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background-color: #1ebe57;
+  }
+
+  &:disabled {
+    background-color: rgba(0, 0, 0, 0.12);
+    color: rgba(0, 0, 0, 0.38);
+  }
+
+  .whatsapp-icon {
+    display: inline-block;
+  }
+
+  mat-spinner {
+    display: inline-block;
+  }
+}
+
 .state-row {
   display: flex;
   align-items: center;
