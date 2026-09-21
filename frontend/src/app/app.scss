@@ -1,7 +1,7 @@
 .app-toolbar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 11;
 }
 
 .app-title {
@@ -17,8 +17,24 @@
   width: auto;
 }
 
-.spacer {
-  flex: 1 1 auto;
+// Separate menu bar rendered below the title bar, with its own background and a shadow
+// so it visually reads as a distinct strip rather than part of the title bar.
+.app-menu-bar {
+  position: sticky;
+  top: 64px;
+  z-index: 10;
+  background: #ede7f6;
+  color: rgba(0, 0, 0, 0.87);
+  min-height: 48px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
 }
 
 .app-nav a.active-link {

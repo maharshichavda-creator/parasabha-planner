@@ -3,23 +3,13 @@
     <img src="assets/Aksharderi.png" alt="BAPS Logo" class="app-logo" />
     {{ title() }}
   </span>
-  <span class="spacer"></span>
+</mat-toolbar>
+
+<mat-toolbar class="app-menu-bar">
   <nav class="app-nav">
-    <a mat-button routerLink="/dashboard" routerLinkActive="active-link">
-      <mat-icon>insights</mat-icon>
-      માસિક આંકડા
-    </a>
-    <a mat-button routerLink="/weekly" routerLinkActive="active-link">
-      <mat-icon>calendar_month</mat-icon>
-      સાપ્તાહિક આયોજન
-    </a>
-    <a mat-button routerLink="/report" routerLinkActive="active-link">
-      <mat-icon>picture_as_pdf</mat-icon>
-      PDF રિપોર્ટ
-    </a>
-    <a mat-button routerLink="/plan-visits" routerLinkActive="active-link">
-      <mat-icon>edit_calendar</mat-icon>
-      મંડળ આયોજન
+    <a mat-button routerLink="/swamis" routerLinkActive="active-link">
+      <mat-icon>self_improvement</mat-icon>
+      સંતો
     </a>
     <a mat-button routerLink="/mandals" routerLinkActive="active-link">
       <mat-icon>location_city</mat-icon>
@@ -29,9 +19,21 @@
       <mat-icon>event_repeat</mat-icon>
       મંડળ-વાર ગોઠવણી
     </a>
-    <a mat-button routerLink="/swamis" routerLinkActive="active-link">
-      <mat-icon>self_improvement</mat-icon>
-      સંતો
+    <a mat-button routerLink="/plan-visits" routerLinkActive="active-link">
+      <mat-icon>edit_calendar</mat-icon>
+      મંડળ આયોજન
+    </a>
+    <a mat-button routerLink="/weekly" routerLinkActive="active-link">
+      <mat-icon>calendar_month</mat-icon>
+      સાપ્તાહિક આયોજન
+    </a>
+    <a mat-button routerLink="/report" routerLinkActive="active-link">
+      <mat-icon>picture_as_pdf</mat-icon>
+      PDF રિપોર્ટ
+    </a>
+    <a mat-button routerLink="/dashboard" routerLinkActive="active-link">
+      <mat-icon>insights</mat-icon>
+      માસિક આંકડા
     </a>
   </nav>
 </mat-toolbar>

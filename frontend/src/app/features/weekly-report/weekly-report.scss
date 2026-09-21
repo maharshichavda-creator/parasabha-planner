@@ -57,6 +57,35 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  // Raised 3D look: layered shadow for depth + a subtle top highlight, with a "pressed"
+  // state on click that flattens the button back down.
+  box-shadow:
+    0 4px 0 #7b1fa2,
+    0 6px 10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(0);
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow:
+      0 5px 0 #7b1fa2,
+      0 8px 14px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    box-shadow:
+      0 1px 0 #7b1fa2,
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(3px);
+  }
+
+  &:disabled {
+    box-shadow: none;
+    transform: none;
+  }
 
   mat-spinner {
     display: inline-block;
@@ -69,14 +98,36 @@ h1 {
   gap: 6px;
   background-color: #25d366;
   color: #fff;
+  // Same raised 3D treatment as the Download PDF button, tinted to match WhatsApp green.
+  box-shadow:
+    0 4px 0 #128c4a,
+    0 6px 10px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(0);
+  transition: box-shadow 0.12s ease, transform 0.12s ease, background-color 0.12s ease;
 
   &:hover:not(:disabled) {
     background-color: #1ebe57;
+    box-shadow:
+      0 5px 0 #128c4a,
+      0 8px 14px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    box-shadow:
+      0 1px 0 #128c4a,
+      0 2px 4px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transform: translateY(3px);
   }
 
   &:disabled {
     background-color: rgba(0, 0, 0, 0.12);
     color: rgba(0, 0, 0, 0.38);
+    box-shadow: none;
+    transform: none;
   }
 
   .whatsapp-icon {
