@@ -58,3 +58,9 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    # NOTE: Render's Blueprint spec (render.yaml) does not support a `headers:` field
+    # for static sites -- custom response headers must be configured manually in the
+    # Render Dashboard (Settings > Redirects/Rewrites & Headers) for this service:
+    #   Path: /manifest.webmanifest   Name: Content-Type    Value: application/manifest+json
+    #   Path: /ngsw-worker.js         Name: Cache-Control   Value: no-cache
+    # See https://render.com/docs/static-site-headers
