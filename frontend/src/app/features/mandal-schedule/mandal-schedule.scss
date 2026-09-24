@@ -18,6 +18,12 @@
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+
+  @media (max-width: 599.98px) {
+    mat-form-field {
+      width: 100%;
+    }
+  }
 }
 
 .sort-order-field {
@@ -31,6 +37,7 @@
 
 .schedule-table {
   width: 100%;
+  min-width: 480px;
 }
 
 .pr-badge {

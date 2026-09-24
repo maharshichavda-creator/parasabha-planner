@@ -8,6 +8,8 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
+  flex-wrap: wrap;
+  row-gap: 8px;
   margin-bottom: 24px;
 }
 
@@ -17,6 +19,10 @@
   gap: 10px;
   min-width: 220px;
   justify-content: center;
+
+  @media (max-width: 599.98px) {
+    min-width: 0;
+  }
 }
 
 .week-range {
@@ -51,6 +57,13 @@
     min-width: 280px;
     flex: 1 1 280px;
   }
+
+  @media (max-width: 599.98px) {
+    mat-form-field {
+      min-width: 0;
+      flex: 1 1 100%;
+    }
+  }
 }
 
 .selected-swamis {
@@ -79,6 +92,7 @@
 
 .visits-table {
   width: 100%;
+  min-width: 640px;
 }
 
 .pr-badge {

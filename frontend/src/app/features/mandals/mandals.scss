@@ -7,6 +7,12 @@
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+
+  @media (max-width: 599.98px) {
+    .name-field {
+      width: 100%;
+    }
+  }
 }
 
 .name-field {
@@ -20,6 +26,7 @@
 
 .mandal-table {
   width: 100%;
+  min-width: 480px;
 }
 
 .empty-state {

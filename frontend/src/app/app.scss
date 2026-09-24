@@ -29,12 +29,28 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
+// Never wrap to a second line: all menu items stay in one row. On phones/tablets there
+// isn't room for icon+text, so that's collapsed to icons only (below); overflow-x is only
+// a safety net in case an unusually narrow viewport still can't fit every icon.
 .app-nav {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-wrap: nowrap;
+  gap: 2px;
   width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
 }
 
 .app-nav a.active-link {
@@ -46,6 +62,56 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+// Tablets and phones: hide the text labels so all 7 menu items fit as icons in one row.
+@media (max-width: 1024px) {
+  .app-nav a .nav-label {
+    display: none;
+  }
+
+  .app-nav a {
+    min-width: 44px;
+    justify-content: center;
+    padding: 0 8px;
+  }
+}
+
+// Small phones: match Angular Material's collapsed 56px toolbar height so the sticky menu
+// bar lines up directly underneath it instead of overlapping/gapping, and tighten spacing.
+@media (max-width: 599.98px) {
+  .app-toolbar {
+    min-height: 56px;
+  }
+
+  .app-menu-bar {
+    top: 56px;
+    min-height: 44px;
+    padding: 0 4px;
+  }
+
+  .app-title {
+    font-size: 0.95rem;
+    gap: 6px;
+  }
+
+  .app-logo {
+    height: 30px;
+  }
+
+  .app-nav a {
+    min-width: 34px;
+    padding: 0 4px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      margin: 0;
+    }
+  }
 }
 
 .app-content {
@@ -53,4 +119,12 @@
   margin: 0 auto;
   padding: 24px;
   box-sizing: border-box;
+
+  @media (max-width: 599.98px) {
+    padding: 12px;
+  }
+
+  @media (min-width: 600px) and (max-width: 1024px) {
+    padding: 16px;
+  }
 }

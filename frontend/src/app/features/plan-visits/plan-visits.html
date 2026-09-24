@@ -190,6 +190,7 @@
 @if (loading()) {
   <p>Loading planned visits...</p>
 } @else {
+  <div class="table-scroll">
   <table mat-table [dataSource]="rows()" class="mat-elevation-z1 visits-table">
     <ng-container matColumnDef="weekday">
       <th mat-header-cell *matHeaderCellDef>Weekday</th>
@@ -262,4 +263,5 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  </div>
 }

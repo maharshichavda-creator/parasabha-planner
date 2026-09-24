@@ -24,6 +24,10 @@ h1 {
   gap: 10px;
   min-width: 220px;
   justify-content: center;
+
+  @media (max-width: 599.98px) {
+    min-width: 0;
+  }
 }
 
 .week-range {
@@ -175,6 +179,11 @@ h1 {
   &.pdf-capturing {
     box-shadow: none;
   }
+
+  @media (max-width: 599.98px) {
+    padding: 16px;
+    border-width: 6px;
+  }
 }
 
 .letterhead {
@@ -191,6 +200,10 @@ h1 {
   height: 92px;
   width: auto;
   margin-bottom: 10px;
+
+  @media (max-width: 599.98px) {
+    height: 60px;
+  }
 }
 
 .letterhead-title {
@@ -198,6 +211,10 @@ h1 {
   font-weight: 800;
   color: #3e2723;
   letter-spacing: 0.01em;
+
+  @media (max-width: 599.98px) {
+    font-size: 1.2rem;
+  }
 }
 
 .report-title {
@@ -313,6 +330,15 @@ h1 {
     padding: 8px 10px;
     text-align: left;
     vertical-align: top;
+  }
+
+  @media (max-width: 599.98px) {
+    font-size: 0.72rem;
+
+    th,
+    td {
+      padding: 5px 6px;
+    }
   }
 
   thead th {

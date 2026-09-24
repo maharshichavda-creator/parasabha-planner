@@ -30,6 +30,7 @@
 @if (loading()) {
   <p>Loading mandals...</p>
 } @else {
+  <div class="table-scroll">
   <table mat-table [dataSource]="mandals()" class="mat-elevation-z1 mandal-table">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -78,6 +79,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  </div>
 
   @if (mandals().length === 0) {
     <p class="empty-state">No mandals yet. Add one above.</p>

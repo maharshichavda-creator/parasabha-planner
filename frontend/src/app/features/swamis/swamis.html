@@ -26,6 +26,7 @@
 @if (loading()) {
   <p>Loading Sant Mandal list...</p>
 } @else {
+  <div class="table-scroll">
   <table mat-table [dataSource]="swamis()" class="mat-elevation-z1 swami-table">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -47,6 +48,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  </div>
 
   @if (swamis().length === 0) {
     <p class="empty-state">No swamis yet. Add one above.</p>

@@ -83,6 +83,8 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
+  flex-wrap: wrap;
+  row-gap: 8px;
   margin-bottom: 24px;
 }
 
@@ -92,6 +94,10 @@
   gap: 10px;
   min-width: 220px;
   justify-content: center;
+
+  @media (max-width: 599.98px) {
+    min-width: 0;
+  }
 }
 
 .week-range {
@@ -121,6 +127,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
+
+  @media (max-width: 599.98px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .day-card {
