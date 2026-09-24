@@ -29,18 +29,20 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-// Never wrap to a second line: all menu items stay in one row. On phones/tablets there
-// isn't room for icon+text, so that's collapsed to icons only (below); overflow-x is only
-// a safety net in case an unusually narrow viewport still can't fit every icon.
+// Menu items never wrap to a second line. On phones/tablets there isn't enough room to
+// show all 7 icon+text items at once, so the bar becomes a horizontally swipeable strip of
+// rounded "pill" tabs (a familiar Android tab-bar pattern) instead of hiding any text.
 .app-nav {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 2px;
+  gap: 6px;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
   scrollbar-width: thin;
 
   &::-webkit-scrollbar {
@@ -55,7 +57,7 @@
 
 .app-nav a.active-link {
   font-weight: 700;
-  text-decoration: underline;
+  background: rgba(103, 58, 183, 0.14);
 }
 
 .app-nav a {
@@ -64,18 +66,44 @@
   gap: 6px;
   flex: 0 0 auto;
   white-space: nowrap;
+  border-radius: 20px;
+  scroll-snap-align: start;
+  transition: background-color 0.15s ease;
 }
 
-// Tablets and phones: hide the text labels so all 7 menu items fit as icons in one row.
+// Tablets and phones: turn the nav into a compact, swipeable pill bar. Icon + text stay
+// together on every item; narrower screens just show fewer pills at once (with the next
+// one peeking at the edge as a natural "swipe for more" hint) rather than losing the labels.
 @media (max-width: 1024px) {
-  .app-nav a .nav-label {
-    display: none;
+  .app-menu-bar {
+    padding: 0 8px;
+  }
+
+  .app-nav {
+    gap: 8px;
+    padding: 6px 2px;
+    // Touch devices rely on the swipe gesture itself; hide the scrollbar for a cleaner,
+    // native tab-bar look. Mouse/trackpad users (pointer: fine) keep the thin scrollbar.
+    @media (pointer: coarse) {
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
   }
 
   .app-nav a {
-    min-width: 44px;
-    justify-content: center;
-    padding: 0 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    background: rgba(0, 0, 0, 0.035);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
   }
 }
 
@@ -89,7 +117,7 @@
   .app-menu-bar {
     top: 56px;
     min-height: 44px;
-    padding: 0 4px;
+    padding: 0 6px;
   }
 
   .app-title {
@@ -102,14 +130,15 @@
   }
 
   .app-nav a {
-    min-width: 34px;
-    padding: 0 4px;
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    gap: 5px;
 
     mat-icon {
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
-      margin: 0;
+      font-size: 19px;
+      width: 19px;
+      height: 19px;
     }
   }
 }
