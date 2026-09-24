@@ -34,13 +34,15 @@ public class MandalService {
     }
 
     public MandalDto create(MandalDto request) {
-        mandalRepository.findByNameIgnoreCaseAndPrs(request.getName().trim(), request.isPrs()).ifPresent(m -> {
-            throw new DuplicateResourceException("A mandal named '" + request.getName() + "' already exists");
-        });
+        mandalRepository.findByNameIgnoreCaseAndPrsAndYuvak(request.getName().trim(), request.isPrs(), request.isYuvak())
+                .ifPresent(m -> {
+                    throw new DuplicateResourceException("A mandal named '" + request.getName() + "' already exists");
+                });
         Mandal mandal = Mandal.builder()
                 .name(request.getName().trim())
                 .pr(request.isPr())
                 .prs(request.isPrs())
+                .yuvak(request.isYuvak())
                 .build();
         mandal = mandalRepository.save(mandal);
         ensurePrsScheduleEntry(mandal);
@@ -49,14 +51,16 @@ public class MandalService {
 
     public MandalDto update(Long id, MandalDto request) {
         Mandal mandal = getOrThrow(id);
-        mandalRepository.findByNameIgnoreCaseAndPrs(request.getName().trim(), request.isPrs()).ifPresent(existing -> {
-            if (!existing.getId().equals(id)) {
-                throw new DuplicateResourceException("A mandal named '" + request.getName() + "' already exists");
-            }
-        });
+        mandalRepository.findByNameIgnoreCaseAndPrsAndYuvak(request.getName().trim(), request.isPrs(), request.isYuvak())
+                .ifPresent(existing -> {
+                    if (!existing.getId().equals(id)) {
+                        throw new DuplicateResourceException("A mandal named '" + request.getName() + "' already exists");
+                    }
+                });
         mandal.setName(request.getName().trim());
         mandal.setPr(request.isPr());
         mandal.setPrs(request.isPrs());
+        mandal.setYuvak(request.isYuvak());
         ensurePrsScheduleEntry(mandal);
         return toDto(mandal);
     }
@@ -115,6 +119,7 @@ public class MandalService {
                 .name(mandal.getName())
                 .pr(mandal.isPr())
                 .prs(mandal.isPrs())
+                .yuvak(mandal.isYuvak())
                 .build();
     }
 }

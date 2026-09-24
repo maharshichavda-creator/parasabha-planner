@@ -16,11 +16,12 @@ import lombok.Setter;
 
 /**
  * A local Mandal (satsang group/venue) that hosts a Parasabha on a given weekday.
- * Names must be unique among mandals of the same category (regular vs. PRS) — a mandal can
- * be re-added under the PRS category with the same name as an existing regular mandal.
+ * Names must be unique among mandals of the same category (regular vs. PRS vs. Yuvak) — a
+ * mandal can be re-added under the PRS or Yuvak category with the same name as an existing
+ * regular mandal.
  */
 @Entity
-@Table(name = "mandal", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "is_prs"}))
+@Table(name = "mandal", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "is_prs", "is_yuvak"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -51,4 +52,10 @@ public class Mandal {
     @ColumnDefault("false")
     @Builder.Default
     private boolean prs = false;
+
+    /** True when the mandal belongs to the "Yuvak Mandal" (youth wing) category. */
+    @Column(name = "is_yuvak", nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    private boolean yuvak = false;
 }

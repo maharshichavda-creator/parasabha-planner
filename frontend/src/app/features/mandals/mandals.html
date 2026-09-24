@@ -13,6 +13,7 @@
 
       <mat-checkbox formControlName="pr">PR mandal</mat-checkbox>
       <mat-checkbox formControlName="prs">PRS mandal</mat-checkbox>
+      <mat-checkbox formControlName="yuvak">Yuvak mandal</mat-checkbox>
 
       <div class="form-actions">
         <button mat-flat-button color="primary" type="submit">
@@ -48,6 +49,15 @@
       <th mat-header-cell *matHeaderCellDef>PRS</th>
       <td mat-cell *matCellDef="let mandal">
         @if (mandal.prs) {
+          <mat-icon color="accent">check_circle</mat-icon>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="yuvak">
+      <th mat-header-cell *matHeaderCellDef>Yuvak</th>
+      <td mat-cell *matCellDef="let mandal">
+        @if (mandal.yuvak) {
           <mat-icon color="accent">check_circle</mat-icon>
         }
       </td>

@@ -42,6 +42,7 @@ public class DashboardService {
         Map<Long, Integer> swamiCounts = new LinkedHashMap<>();
         Map<MandalStatKey, String> mandalNames = new LinkedHashMap<>();
         Map<MandalStatKey, Boolean> mandalPrFlags = new LinkedHashMap<>();
+        Map<MandalStatKey, Boolean> mandalYuvakFlags = new LinkedHashMap<>();
         Map<MandalStatKey, Integer> mandalCounts = new LinkedHashMap<>();
 
         for (SwamiVisit visit : visits) {
@@ -53,6 +54,7 @@ public class DashboardService {
             MandalStatKey key = new MandalStatKey(mandal.getId(), isPrsVisit);
             mandalNames.putIfAbsent(key, mandal.getName());
             mandalPrFlags.putIfAbsent(key, mandal.isPr());
+            mandalYuvakFlags.putIfAbsent(key, mandal.isYuvak());
             mandalCounts.merge(key, 1, Integer::sum);
 
             for (var assignment : visit.getAssignments()) {
@@ -77,6 +79,7 @@ public class DashboardService {
                         .mandalId(e.getKey().mandalId())
                         .mandalName(mandalNames.get(e.getKey()))
                         .mandalPr(mandalPrFlags.get(e.getKey()))
+                        .mandalYuvak(mandalYuvakFlags.get(e.getKey()))
                         .prs(e.getKey().prs())
                         .visitCount(e.getValue())
                         .build())

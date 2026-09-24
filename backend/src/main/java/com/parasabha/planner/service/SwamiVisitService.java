@@ -144,6 +144,7 @@ public class SwamiVisitService {
                 .mandalId(entry.getMandal().getId())
                 .mandalName(entry.getMandal().getName())
                 .mandalPr(entry.getMandal().isPr())
+                .mandalYuvak(entry.getMandal().isYuvak())
                 .swamis(swamis)
                 .vehicleArrangement(visit.getVehicleArrangement())
                 .build();

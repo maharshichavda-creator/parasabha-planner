@@ -23,6 +23,7 @@ public class ScheduleEntryDto {
     private Long mandalId;
     private String mandalName;
     private boolean mandalPr;
+    private boolean mandalYuvak;
 
     private List<SwamiDto> swamis;
 

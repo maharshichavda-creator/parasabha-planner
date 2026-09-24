@@ -21,4 +21,6 @@ public class MandalDto {
     private boolean pr;
 
     private boolean prs;
+
+    private boolean yuvak;
 }

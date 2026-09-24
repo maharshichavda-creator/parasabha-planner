@@ -8,4 +8,6 @@ public interface MandalRepository extends JpaRepository<Mandal, Long> {
     Optional<Mandal> findByNameIgnoreCase(String name);
 
     Optional<Mandal> findByNameIgnoreCaseAndPrs(String name, boolean prs);
+
+    Optional<Mandal> findByNameIgnoreCaseAndPrsAndYuvak(String name, boolean prs, boolean yuvak);
 }

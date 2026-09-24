@@ -16,6 +16,7 @@ public class MonthlyMandalStatDto {
     private Long mandalId;
     private String mandalName;
     private boolean mandalPr;
+    private boolean mandalYuvak;
     /** True if any of this Mandal's visits in the month were planned under the special PRS group. */
     private boolean prs;
     private int visitCount;

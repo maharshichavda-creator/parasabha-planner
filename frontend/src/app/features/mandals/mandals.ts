@@ -36,20 +36,22 @@ export class MandalsComponent {
   readonly mandals = signal<Mandal[]>([]);
   readonly loading = signal(true);
   readonly editingId = signal<number | null>(null);
-  readonly displayedColumns = ['name', 'pr', 'prs', 'actions'];
+  readonly displayedColumns = ['name', 'pr', 'prs', 'yuvak', 'actions'];
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
     pr: [false],
-    prs: [false]
+    prs: [false],
+    yuvak: [false]
   });
 
   constructor() {
     this.load();
   }
 
-  /** Sort order for the mandal category: regular first, then PR, then PRS. */
+  /** Sort order for the mandal category: regular first, then PR, then PRS, then Yuvak. */
   private categoryRank(mandal: Mandal): number {
+    if (mandal.yuvak) return 3;
     if (mandal.prs) return 2;
     if (mandal.pr) return 1;
     return 0;
@@ -75,12 +77,12 @@ export class MandalsComponent {
 
   startEdit(mandal: Mandal): void {
     this.editingId.set(mandal.id ?? null);
-    this.form.setValue({ name: mandal.name, pr: mandal.pr, prs: mandal.prs });
+    this.form.setValue({ name: mandal.name, pr: mandal.pr, prs: mandal.prs, yuvak: mandal.yuvak });
   }
 
   cancelEdit(): void {
     this.editingId.set(null);
-    this.form.reset({ name: '', pr: false, prs: false });
+    this.form.reset({ name: '', pr: false, prs: false, yuvak: false });
   }
 
   submit(): void {

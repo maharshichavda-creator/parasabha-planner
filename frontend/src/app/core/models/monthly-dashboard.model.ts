@@ -10,6 +10,7 @@ export interface MonthlyMandalStat {
   mandalId: number;
   mandalName: string;
   mandalPr: boolean;
+  mandalYuvak: boolean;
   /** True if any of this Mandal's visits in the month were planned under the special PRS group. */
   prs: boolean;
   visitCount: number;

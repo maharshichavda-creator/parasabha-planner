@@ -3,4 +3,5 @@ export interface Mandal {
   name: string;
   pr: boolean;
   prs: boolean;
+  yuvak: boolean;
 }

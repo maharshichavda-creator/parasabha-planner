@@ -9,6 +9,7 @@ export interface ScheduleEntry {
   mandalId: number;
   mandalName?: string;
   mandalPr?: boolean;
+  mandalYuvak?: boolean;
   swamis: Swami[];
   /** Free-text vehicle arrangement (વાહન વ્યવસ્થા) planned for this entry's exact date this week. */
   vehicleArrangement?: string;

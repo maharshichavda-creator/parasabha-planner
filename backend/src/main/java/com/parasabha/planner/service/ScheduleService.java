@@ -218,6 +218,7 @@ public class ScheduleService {
                 .mandalId(entry.getMandal().getId())
                 .mandalName(entry.getMandal().getName())
                 .mandalPr(entry.getMandal().isPr())
+                .mandalYuvak(entry.getMandal().isYuvak())
                 .swamis(swamis)
                 .vehicleArrangement(vehicleArrangement)
                 .build();
