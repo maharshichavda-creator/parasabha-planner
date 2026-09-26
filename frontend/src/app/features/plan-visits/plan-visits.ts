@@ -79,6 +79,11 @@ export class PlanVisitsComponent {
   readonly prsWeekdayOptions = WEEKDAY_ORDER.filter((w): w is Weekday => w !== 'PRS');
   readonly weekdayLabels = WEEKDAY_LABELS;
 
+  /** Gujarati label for a weekday, used in the grid columns. */
+  weekdayLabel(weekday: Weekday): string {
+    return WEEKDAY_LABELS[weekday];
+  }
+
   readonly form = this.fb.nonNullable.group({
     scheduleEntryId: [null as number | null, Validators.required],
     p1SwamiId: [null as number | null],

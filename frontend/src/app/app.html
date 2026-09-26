@@ -1,43 +1,49 @@
-<mat-toolbar color="primary" class="app-toolbar">
-  <span class="app-title">
-    <img src="assets/Aksharderi.png" alt="BAPS Logo" class="app-logo" />
-    {{ title() }}
-  </span>
-</mat-toolbar>
+@if (isLoggedIn() && !isLoginScreen()) {
+  <mat-toolbar color="primary" class="app-toolbar">
+    <span class="app-title">
+      <img src="assets/Aksharderi.png" alt="BAPS Logo" class="app-logo" />
+      {{ title() }}
+    </span>
+    <span class="app-toolbar-spacer"></span>
+    <button mat-icon-button (click)="logout()" aria-label="Logout" matTooltip="Logout">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
 
-<mat-toolbar class="app-menu-bar">
-  <nav class="app-nav">
-    <a mat-button routerLink="/swamis" routerLinkActive="active-link" aria-label="સંતો">
-      <mat-icon>self_improvement</mat-icon>
-      <span class="nav-label">સંતો</span>
-    </a>
-    <a mat-button routerLink="/mandals" routerLinkActive="active-link" aria-label="મંડળો">
-      <mat-icon>location_city</mat-icon>
-      <span class="nav-label">મંડળો</span>
-    </a>
-    <a mat-button routerLink="/mandal-schedule" routerLinkActive="active-link" aria-label="મંડળ-વાર ગોઠવણી">
-      <mat-icon>event_repeat</mat-icon>
-      <span class="nav-label">મંડળ-વાર ગોઠવણી</span>
-    </a>
-    <a mat-button routerLink="/plan-visits" routerLinkActive="active-link" aria-label="મંડળ આયોજન">
-      <mat-icon>edit_calendar</mat-icon>
-      <span class="nav-label">મંડળ આયોજન</span>
-    </a>
-    <a mat-button routerLink="/weekly" routerLinkActive="active-link" aria-label="સાપ્તાહિક આયોજન">
-      <mat-icon>calendar_month</mat-icon>
-      <span class="nav-label">સાપ્તાહિક આયોજન</span>
-    </a>
-    <a mat-button routerLink="/report" routerLinkActive="active-link" aria-label="PDF રિપોર્ટ">
-      <mat-icon>picture_as_pdf</mat-icon>
-      <span class="nav-label">PDF રિપોર્ટ</span>
-    </a>
-    <a mat-button routerLink="/dashboard" routerLinkActive="active-link" aria-label="માસિક આંકડા">
-      <mat-icon>insights</mat-icon>
-      <span class="nav-label">માસિક આંકડા</span>
-    </a>
-  </nav>
-</mat-toolbar>
+  <mat-toolbar class="app-menu-bar">
+    <nav class="app-nav">
+      <a mat-button routerLink="/swamis" routerLinkActive="active-link" aria-label="સંતો">
+        <mat-icon>self_improvement</mat-icon>
+        <span class="nav-label">સંતો</span>
+      </a>
+      <a mat-button routerLink="/mandals" routerLinkActive="active-link" aria-label="મંડળો">
+        <mat-icon>location_city</mat-icon>
+        <span class="nav-label">મંડળો</span>
+      </a>
+      <a mat-button routerLink="/mandal-schedule" routerLinkActive="active-link" aria-label="મંડળ-વાર ગોઠવણી">
+        <mat-icon>event_repeat</mat-icon>
+        <span class="nav-label">મંડળ-વાર ગોઠવણી</span>
+      </a>
+      <a mat-button routerLink="/plan-visits" routerLinkActive="active-link" aria-label="મંડળ આયોજન">
+        <mat-icon>edit_calendar</mat-icon>
+        <span class="nav-label">મંડળ આયોજન</span>
+      </a>
+      <a mat-button routerLink="/weekly" routerLinkActive="active-link" aria-label="સાપ્તાહિક આયોજન">
+        <mat-icon>calendar_month</mat-icon>
+        <span class="nav-label">સાપ્તાહિક આયોજન</span>
+      </a>
+      <a mat-button routerLink="/report" routerLinkActive="active-link" aria-label="PDF રિપોર્ટ">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <span class="nav-label">PDF રિપોર્ટ</span>
+      </a>
+      <a mat-button routerLink="/dashboard" routerLinkActive="active-link" aria-label="માસિક આંકડા">
+        <mat-icon>insights</mat-icon>
+        <span class="nav-label">માસિક આંકડા</span>
+      </a>
+    </nav>
+  </mat-toolbar>
+}
 
-<main class="app-content">
+<main class="app-content" [class.app-content-bare]="!isLoggedIn() || isLoginScreen()">
   <router-outlet></router-outlet>
 </main>

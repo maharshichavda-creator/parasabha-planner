@@ -12,6 +12,10 @@
   gap: 10px;
 }
 
+.app-toolbar-spacer {
+  flex: 1 1 auto;
+}
+
 .app-logo {
   height: 40px;
   width: auto;
@@ -155,5 +159,17 @@
 
   @media (min-width: 600px) and (max-width: 1024px) {
     padding: 16px;
+  }
+}
+
+// The login screen renders its own full-height, full-bleed layout - drop the app shell's
+// max-width/padding constraints so it isn't boxed in.
+.app-content-bare {
+  max-width: none;
+  padding: 0;
+
+  @media (max-width: 599.98px),
+    (min-width: 600px) and (max-width: 1024px) {
+    padding: 0;
   }
 }

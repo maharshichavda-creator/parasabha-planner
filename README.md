@@ -34,6 +34,9 @@ parasabha-planner/
   show up in the weekly view for a given week. A slot with no `SwamiVisit` for
   the displayed week shows blank — nothing is assumed or carried over from
   other weeks.
+- **AppUser** – a login account (`username`, BCrypt `passwordHash`). There's no
+  role/permission model; any valid username/password lets you into the whole
+  app. See [Login](#login) below.
 
 On first startup (only if the schedule table is empty) the backend seeds the
 database with the Mandal/Weekday template and Swami roster from
@@ -97,6 +100,52 @@ The API starts on **http://localhost:8080**. Key endpoints:
 | DELETE | `/api/swami-visits/{id}`       | Clear a planned visit (slot goes back to blank) |
 | GET/POST/PUT/DELETE | `/api/mandals`, `/api/mandals/{id}` | Mandal CRUD |
 | GET/POST/PUT/DELETE | `/api/swamis`, `/api/swamis/{id}`   | Swami CRUD  |
+| POST   | `/api/auth/login`              | Validate `{ username, password }` against the `app_user` table; `200` + `{ username }` on success, `401` on invalid credentials |
+
+### Login
+
+The frontend shows a login screen and blocks the whole app (including the menu)
+until the user signs in against the backend's `app_user` table — see
+[`AuthController`](backend/src/main/java/com/parasabha/planner/controller/AuthController.java) /
+[`AuthService`](backend/src/main/java/com/parasabha/planner/service/AuthService.java).
+
+On first startup (only if `app_user` is empty), a single default account is
+seeded — see
+[`AppUserSeeder`](backend/src/main/java/com/parasabha/planner/seed/AppUserSeeder.java):
+
+- username: `admin`
+- password: `admin@123` (override the seeded defaults via the `APP_ADMIN_USERNAME`
+  / `APP_ADMIN_PASSWORD` env vars **before** the very first startup)
+
+To add a new user or change a password afterwards, insert/update a row directly in
+the `app_user` table — there's no in-app "manage users" screen. The
+`password_hash` column must contain a **BCrypt hash**, never plaintext:
+
+1. Generate a BCrypt hash for the new password. The backend already depends on
+   `spring-security-crypto`, so you can generate one with `jshell` against the
+   built project classpath — no extra tools needed:
+
+   ```powershell
+   cd backend
+   .\mvnw.cmd -q dependency:build-classpath "-Dmdep.outputFile=cp.txt"
+   $fullCp = "target\classes;" + (Get-Content cp.txt -Raw)
+   'System.out.println(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("YOUR-NEW-PASSWORD"));' | jshell "--class-path" $fullCp -q -
+   Remove-Item cp.txt
+   ```
+
+   (On macOS/Linux, `htpasswd -bnBC 10 "" 'YOUR-NEW-PASSWORD' | tr -d ':\n'`
+   works too, if Apache's `httpd`/`apache2-utils` tools are installed.)
+
+2. Insert the new account (or update an existing one) using that hash, e.g. with `psql`:
+
+   ```powershell
+   psql -h localhost -p 1522 -U postgres -d parasabha_planner -c "INSERT INTO app_user (username, password_hash) VALUES ('newuser', 'PASTE-THE-GENERATED-HASH-HERE');"
+   ```
+
+   To change an existing user's password instead: `UPDATE app_user SET password_hash = 'PASTE-THE-GENERATED-HASH-HERE' WHERE username = 'newuser';`
+
+Login state is kept in the browser's `sessionStorage`, so it survives a page
+refresh but not closing the tab.
 
 ## 3. Run the frontend
 

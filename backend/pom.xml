@@ -48,6 +48,13 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<!-- Only the password-hashing utilities (BCrypt), not the full Spring Security
+		     auto-configuration/filter chain - this app has a single simple login endpoint,
+		     not a full security model. -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

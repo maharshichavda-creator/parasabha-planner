@@ -194,7 +194,7 @@
   <table mat-table [dataSource]="rows()" class="mat-elevation-z1 visits-table">
     <ng-container matColumnDef="weekday">
       <th mat-header-cell *matHeaderCellDef>Weekday</th>
-      <td mat-cell *matCellDef="let row">{{ row.entry.weekday }}</td>
+      <td mat-cell *matCellDef="let row">{{ weekdayLabel(row.entry.weekday) }}</td>
     </ng-container>
 
     <ng-container matColumnDef="date">
