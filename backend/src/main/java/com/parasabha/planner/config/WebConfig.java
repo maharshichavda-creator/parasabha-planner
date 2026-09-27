@@ -20,6 +20,11 @@ public class WebConfig implements WebMvcConfigurer {
         List<String> origins = new ArrayList<>(Arrays.asList(allowedOrigins.split("\\s*,\\s*")));
         origins.add("http://localhost:*");
         origins.add("https://localhost:*");
+        // Capacitor's Android/iOS WebView sends these exact origins (no port suffix),
+        // which the ":*" patterns above don't match.
+        origins.add("https://localhost");
+        origins.add("http://localhost");
+        origins.add("capacitor://localhost");
 
         registry.addMapping("/api/**")
                 .allowedOriginPatterns(origins.toArray(new String[0]))
