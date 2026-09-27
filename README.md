@@ -9,6 +9,7 @@ A full‑stack web app for managing the **weekly Parasabha schedule**: which Man
 | Layer     | Technology                                              |
 |-----------|----------------------------------------------------------|
 | Frontend  | Angular 22 (standalone components) + Angular Material    |
+| Mobile    | Capacitor (wraps the Angular app as a native Android app) |
 | Backend   | Spring Boot 3.5 (Java 21), Spring Data JPA, Bean Validation |
 | Database  | PostgreSQL                                                |
 
@@ -18,6 +19,7 @@ A full‑stack web app for managing the **weekly Parasabha schedule**: which Man
 parasabha-planner/
 ├── backend/    Spring Boot REST API (Maven, mvnw wrapper included)
 ├── frontend/   Angular app (Angular CLI, npm)
+│   └── android/  Capacitor-generated native Android project (Gradle)
 └── docker-compose.yml   Optional local PostgreSQL container
 ```
 
@@ -184,6 +186,37 @@ cd frontend
 npm run build
 # serve dist/frontend/browser with any static file server / reverse proxy to the API
 ```
+
+## Android app (Capacitor)
+
+The `frontend/` project is wrapped as a native Android app with
+[Capacitor](https://capacitorjs.com) — see `frontend/capacitor.config.ts` and the generated
+`frontend/android/` Gradle project. Since the packaged app has no origin of its own (it's
+served from the device, not a browser tab pointed at `localhost`), it always calls the
+**deployed** backend, configured via `frontend/src/environments/environment.mobile.ts`
+(defaults to `https://parasabha-planner-backend.onrender.com/api` — update this if your
+backend is deployed elsewhere).
+
+Prerequisites: [Android Studio](https://developer.android.com/studio) (Android SDK + an
+emulator or a physical device with USB debugging enabled).
+
+```powershell
+cd frontend
+npm install                 # first time only
+npm run cap:sync            # builds the mobile bundle + copies it into android/
+npx cap open android        # opens the project in Android Studio — click Run
+```
+
+Or build/run from the CLI once the Android SDK is installed (`ANDROID_HOME` set):
+
+```powershell
+cd frontend\android
+.\gradlew.bat assembleDebug   # outputs app\build\outputs\apk\debug\app-debug.apk
+```
+
+Whenever frontend code changes and you want them reflected in the Android app, re-run
+`npm run cap:sync` (or `npx cap sync android` after a manual `npm run build:mobile`) before
+rebuilding/reinstalling.
 
 ## Deploying to Render (GitHub + Render)
 
