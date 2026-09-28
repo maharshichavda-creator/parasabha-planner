@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import type { jsPDF } from 'jspdf';
+import { Capacitor } from '@capacitor/core';
 import { ScheduleService } from '../../core/services/schedule.service';
 import { WeeklyTopicService } from '../../core/services/weekly-topic.service';
 import { ScheduleEntry, WeeklyScheduleDay, WeeklyTopic } from '../../core/models';
@@ -147,16 +148,29 @@ export class WeeklyReportComponent {
     this.downloadingPdf.set(true);
     try {
       const result = await this.generateReportPdf();
-      result?.pdf.save(result.fileName);
+      if (!result) return;
+
+      if (Capacitor.isNativePlatform()) {
+        // The Android WebView bundled with Capacitor doesn't implement the anchor
+        // "download" attribute the way a full browser does, so `pdf.save()` silently
+        // does nothing there. Persist the file through the native Filesystem plugin
+        // instead, so there's an actual file on the device afterwards.
+        await this.saveNativePdf(result.pdf, result.fileName);
+        return;
+      }
+
+      result.pdf.save(result.fileName);
     } finally {
       this.downloadingPdf.set(false);
     }
   }
 
   /**
-   * Prefers the Web Share API with an actual file attachment (`navigator.share({ files })`),
-   * which on supported browsers/devices opens the OS share sheet - picking WhatsApp there
-   * attaches the PDF directly, no manual step needed. wa.me links alone can never do this
+   * On native (Android/iOS), uses the Capacitor Share plugin with a real file URI - this opens
+   * the OS share sheet where picking WhatsApp attaches the PDF directly, no manual step needed.
+   *
+   * On web, prefers the Web Share API with an actual file attachment (`navigator.share({ files })`),
+   * which on supported browsers/devices does the same thing. wa.me links alone can never do this
    * (they can only pre-fill chat text, not attach a file), so that's kept only as a fallback
    * for browsers where file sharing isn't available.
    */
@@ -170,6 +184,19 @@ export class WeeklyReportComponent {
       if (!result) return;
 
       const message = `Parasabha - સાપ્તાહિક આયોજન (${this.weekRangeLabel()})`;
+
+      if (Capacitor.isNativePlatform()) {
+        // `navigator.share`/`navigator.canShare` aren't implemented in the Android System
+        // WebView Capacitor renders the app in, so they always fall through to the wa.me
+        // text-only fallback below - the actual bug being fixed here. The native Share
+        // plugin talks to Android's real share sheet (ACTION_SEND with a FileProvider
+        // content:// URI), which WhatsApp accepts as a genuine file attachment.
+        const fileUri = await this.writeNativePdfToCache(result.pdf, result.fileName);
+        const { Share } = await import('@capacitor/share');
+        await Share.share({ title: 'Parasabha Planning', text: message, url: fileUri, dialogTitle: 'Share plan via WhatsApp' });
+        return;
+      }
+
       const file = new File([result.pdf.output('blob')], result.fileName, { type: 'application/pdf' });
       const shareData: ShareData = { files: [file], title: 'Parasabha Planning', text: message };
 
@@ -197,6 +224,38 @@ export class WeeklyReportComponent {
     } finally {
       this.sharingWhatsApp.set(false);
     }
+  }
+
+  /** Saves the PDF to the device's Documents area via the native Filesystem plugin. */
+  private async saveNativePdf(pdf: jsPDF, fileName: string): Promise<void> {
+    const { Filesystem, Directory } = await import('@capacitor/filesystem');
+    const data = this.pdfToBase64(pdf);
+    try {
+      await Filesystem.writeFile({ path: fileName, data, directory: Directory.Documents, recursive: true });
+      this.snackBar.open(`PDF saved to Documents as "${fileName}".`, 'Dismiss', { duration: 5000 });
+    } catch {
+      // Directory.Documents can reject on some Android versions/permission states - fall back
+      // to the always-available Cache directory and let the user pick a save location themselves
+      // (e.g. "Files", Drive) via the native share sheet.
+      const fileUri = await this.writeNativePdfToCache(pdf, fileName);
+      const { Share } = await import('@capacitor/share');
+      await Share.share({ title: 'Save PDF', url: fileUri, dialogTitle: 'Save PDF' });
+    }
+  }
+
+  /** Writes the PDF into the app's cache dir (always writable, no permissions needed) and returns its file URI. */
+  private async writeNativePdfToCache(pdf: jsPDF, fileName: string): Promise<string> {
+    const { Filesystem, Directory } = await import('@capacitor/filesystem');
+    const data = this.pdfToBase64(pdf);
+    const result = await Filesystem.writeFile({ path: fileName, data, directory: Directory.Cache });
+    return result.uri;
+  }
+
+  /** Extracts the raw base64 payload (no `data:` prefix) from a generated PDF, as required by the Filesystem plugin. */
+  private pdfToBase64(pdf: jsPDF): string {
+    const dataUri = pdf.output('datauristring');
+    const commaIndex = dataUri.indexOf(',');
+    return commaIndex >= 0 ? dataUri.slice(commaIndex + 1) : dataUri;
   }
 
   private async generateReportPdf(): Promise<{ pdf: jsPDF; fileName: string } | null> {
