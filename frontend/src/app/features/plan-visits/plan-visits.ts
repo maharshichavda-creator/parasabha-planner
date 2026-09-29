@@ -119,11 +119,18 @@ export class PlanVisitsComponent {
         if (dayDiff !== 0) return dayDiff;
         return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
       })
-      .map((entry) => ({
-        entry,
-        dateLabel: formatDay(expectedDateFor(weekStart, entry.weekday)),
-        visit: entry.id !== undefined ? visitsByEntryId.get(entry.id) : undefined
-      }));
+      .map((entry) => {
+        const visit = entry.id !== undefined ? visitsByEntryId.get(entry.id) : undefined;
+        // For PRS entries the schedule slot itself has no fixed weekday, so once a visit is
+        // planned, show the day it was actually assigned to (visit.visitDate) rather than the
+        // PRS slot's fallback expected date (which is always the week's Monday).
+        const date = visit ? fromIsoDate(visit.visitDate) : expectedDateFor(weekStart, entry.weekday);
+        return {
+          entry,
+          dateLabel: formatDay(date),
+          visit
+        };
+      });
   });
 
   readonly additionalSwamis = computed(() => {
