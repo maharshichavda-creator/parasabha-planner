@@ -1,5 +1,8 @@
-@if (isLoggedIn() && !isLoginScreen()) {
+﻿@if (isLoggedIn() && !isLoginScreen()) {
   <mat-toolbar color="primary" class="app-toolbar">
+    <button mat-icon-button (click)="toggleMenu()" aria-label="Toggle menu" matTooltip="Menu">
+      <mat-icon>menu</mat-icon>
+    </button>
     <span class="app-title">
       <img src="assets/Aksharderi.png" alt="BAPS Logo" class="app-logo" />
       {{ title() }}
@@ -10,40 +13,44 @@
     </button>
   </mat-toolbar>
 
-  <mat-toolbar class="app-menu-bar">
+  <aside class="app-sidebar" [class.collapsed]="collapsed()" [class.mobile-open]="mobileOpen()">
     <nav class="app-nav">
-      <a mat-button routerLink="/swamis" routerLinkActive="active-link" aria-label="સંતો">
+      <a routerLink="/swamis" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'àª¸àª‚àª¤à«‹' : ''" matTooltipPosition="right" aria-label="àª¸àª‚àª¤à«‹">
         <mat-icon>self_improvement</mat-icon>
-        <span class="nav-label">સંતો</span>
+        <span class="nav-label">àª¸àª‚àª¤à«‹</span>
       </a>
-      <a mat-button routerLink="/mandals" routerLinkActive="active-link" aria-label="મંડળો">
+      <a routerLink="/mandals" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'àª®àª‚àª¡àª³à«‹' : ''" matTooltipPosition="right" aria-label="àª®àª‚àª¡àª³à«‹">
         <mat-icon>location_city</mat-icon>
-        <span class="nav-label">મંડળો</span>
+        <span class="nav-label">àª®àª‚àª¡àª³à«‹</span>
       </a>
-      <a mat-button routerLink="/mandal-schedule" routerLinkActive="active-link" aria-label="મંડળ-વાર ગોઠવણી">
+      <a routerLink="/mandal-schedule" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'àª®àª‚àª¡àª³-àªµàª¾àª° àª—à«‹àª àªµàª£à«€' : ''" matTooltipPosition="right" aria-label="àª®àª‚àª¡àª³-àªµàª¾àª° àª—à«‹àª àªµàª£à«€">
         <mat-icon>event_repeat</mat-icon>
-        <span class="nav-label">મંડળ-વાર ગોઠવણી</span>
+        <span class="nav-label">àª®àª‚àª¡àª³-àªµàª¾àª° àª—à«‹àª àªµàª£à«€</span>
       </a>
-      <a mat-button routerLink="/plan-visits" routerLinkActive="active-link" aria-label="મંડળ આયોજન">
+      <a routerLink="/plan-visits" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'àª®àª‚àª¡àª³ àª†àª¯à«‹àªœàª¨' : ''" matTooltipPosition="right" aria-label="àª®àª‚àª¡àª³ àª†àª¯à«‹àªœàª¨">
         <mat-icon>edit_calendar</mat-icon>
-        <span class="nav-label">મંડળ આયોજન</span>
+        <span class="nav-label">àª®àª‚àª¡àª³ àª†àª¯à«‹àªœàª¨</span>
       </a>
-      <a mat-button routerLink="/weekly" routerLinkActive="active-link" aria-label="સાપ્તાહિક આયોજન">
+      <a routerLink="/weekly" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'àª¸àª¾àªªà«àª¤àª¾àª¹àª¿àª• àª†àª¯à«‹àªœàª¨' : ''" matTooltipPosition="right" aria-label="àª¸àª¾àªªà«àª¤àª¾àª¹àª¿àª• àª†àª¯à«‹àªœàª¨">
         <mat-icon>calendar_month</mat-icon>
-        <span class="nav-label">સાપ્તાહિક આયોજન</span>
+        <span class="nav-label">àª¸àª¾àªªà«àª¤àª¾àª¹àª¿àª• àª†àª¯à«‹àªœàª¨</span>
       </a>
-      <a mat-button routerLink="/report" routerLinkActive="active-link" aria-label="PDF રિપોર્ટ">
+      <a routerLink="/report" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'PDF àª°àª¿àªªà«‹àª°à«àªŸ' : ''" matTooltipPosition="right" aria-label="PDF àª°àª¿àªªà«‹àª°à«àªŸ">
         <mat-icon>picture_as_pdf</mat-icon>
-        <span class="nav-label">PDF રિપોર્ટ</span>
+        <span class="nav-label">PDF àª°àª¿àªªà«‹àª°à«àªŸ</span>
       </a>
-      <a mat-button routerLink="/dashboard" routerLinkActive="active-link" aria-label="માસિક આંકડા">
+      <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-item" (click)="onNavigate()" [matTooltip]="collapsed() ? 'àª®àª¾àª¸àª¿àª• àª†àª‚àª•àª¡àª¾' : ''" matTooltipPosition="right" aria-label="àª®àª¾àª¸àª¿àª• àª†àª‚àª•àª¡àª¾">
         <mat-icon>insights</mat-icon>
-        <span class="nav-label">માસિક આંકડા</span>
+        <span class="nav-label">àª®àª¾àª¸àª¿àª• àª†àª‚àª•àª¡àª¾</span>
       </a>
     </nav>
-  </mat-toolbar>
+  </aside>
+  @if (mobileOpen()) {
+    <div class="sidebar-backdrop" (click)="mobileOpen.set(false)"></div>
+  }
 }
 
-<main class="app-content" [class.app-content-bare]="!isLoggedIn() || isLoginScreen()">
+<main class="app-content" [class.app-content-bare]="!isLoggedIn() || isLoginScreen()"`n  [class.with-sidebar]="isLoggedIn() && !isLoginScreen()" [class.sidebar-collapsed]="collapsed()">
   <router-outlet></router-outlet>
 </main>
+
