@@ -54,12 +54,12 @@
     </mat-card>
     <mat-card class="summary-tile">
       <mat-icon class="summary-icon">self_improvement</mat-icon>
-      <div class="summary-value">{{ swamiStats().length }}</div>
+      <div class="summary-value">{{ activeSwamiCount() }}</div>
       <div class="summary-label">Sant Mandal Active</div>
     </mat-card>
     <mat-card class="summary-tile">
       <mat-icon class="summary-icon">location_city</mat-icon>
-      <div class="summary-value">{{ mandalStats().length }}</div>
+      <div class="summary-value">{{ activeMandalCount() }}</div>
       <div class="summary-label">Mandals Covered</div>
     </mat-card>
   </div>
@@ -81,7 +81,7 @@
             @for (stat of swamiStats(); track stat.swamiId; let i = $index) {
               <li class="stat-row">
                 <div class="stat-rank">
-                  @if (rankMedal(i); as medal) {
+                              @if (rankMedal(i, stat.visitCount); as medal) {
                     <span class="medal">{{ medal }}</span>
                   } @else {
                     <span class="rank-number">{{ i + 1 }}</span>
@@ -119,7 +119,7 @@
             @for (stat of mandalStats(); track stat.mandalId + '-' + stat.prs; let i = $index) {
               <li class="stat-row">
                 <div class="stat-rank">
-                  @if (rankMedal(i); as medal) {
+                              @if (rankMedal(i, stat.visitCount); as medal) {
                     <span class="medal">{{ medal }}</span>
                   } @else {
                     <span class="rank-number">{{ i + 1 }}</span>

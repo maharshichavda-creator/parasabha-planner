@@ -57,6 +57,8 @@ export class DashboardComponent {
 
   readonly maxSwamiCount = computed(() => Math.max(1, ...this.swamiStats().map((s) => s.visitCount)));
   readonly maxMandalCount = computed(() => Math.max(1, ...this.mandalStats().map((m) => m.visitCount)));
+  readonly activeSwamiCount = computed(() => this.swamiStats().filter((s) => s.visitCount > 0).length);
+  readonly activeMandalCount = computed(() => this.mandalStats().filter((m) => m.visitCount > 0).length);
 
   constructor() {
     this.load();
@@ -104,10 +106,11 @@ export class DashboardComponent {
 
   /** Bar width as a percentage of the highest count in its list - floored so small counts stay visible. */
   barWidth(count: number, max: number): string {
+    if (count <= 0) return '0%';
     return `${Math.max(6, Math.round((count / max) * 100))}%`;
   }
 
-  rankMedal(index: number): string | null {
-    return RANK_MEDALS[index] ?? null;
+  rankMedal(index: number, count: number): string | null {
+    return count > 0 ? (RANK_MEDALS[index] ?? null) : null;
   }
 }

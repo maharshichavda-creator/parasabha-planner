@@ -8,6 +8,8 @@ import com.parasabha.planner.dto.MonthlyDashboardDto;
 import com.parasabha.planner.dto.MonthlyMandalStatDto;
 import com.parasabha.planner.dto.MonthlySwamiStatDto;
 import com.parasabha.planner.dto.YearlyDashboardDto;
+import com.parasabha.planner.repository.MandalRepository;
+import com.parasabha.planner.repository.SwamiRepository;
 import com.parasabha.planner.repository.SwamiVisitRepository;
 import java.time.LocalDate;
 import java.time.Month;
@@ -15,10 +17,12 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,8 @@ public class DashboardService {
     private static final DateTimeFormatter MONTH_LABEL_FORMAT = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH);
 
     private final SwamiVisitRepository swamiVisitRepository;
+    private final SwamiRepository swamiRepository;
+    private final MandalRepository mandalRepository;
 
     public MonthlyDashboardDto getMonthlyStats(YearMonth month) {
         VisitStats stats = aggregate(month.atDay(1), month.atEndOfMonth());
@@ -84,6 +90,24 @@ public class DashboardService {
                 swamiNames.putIfAbsent(swami.getId(), swami.getName());
                 swamiCounts.merge(swami.getId(), 1, Integer::sum);
             }
+        }
+
+        // Include Swamis and Mandals with no visits in the period so they show up with a count of 0.
+        for (Swami swami : swamiRepository.findAll()) {
+            swamiNames.putIfAbsent(swami.getId(), swami.getName());
+            swamiCounts.putIfAbsent(swami.getId(), 0);
+        }
+        Set<Long> visitedMandalIds = new HashSet<>();
+        mandalCounts.keySet().forEach(k -> visitedMandalIds.add(k.mandalId()));
+        for (Mandal mandal : mandalRepository.findAll()) {
+            if (visitedMandalIds.contains(mandal.getId())) {
+                continue;
+            }
+            MandalStatKey key = new MandalStatKey(mandal.getId(), mandal.isPrs());
+            mandalNames.put(key, mandal.getName());
+            mandalPrFlags.put(key, mandal.isPr());
+            mandalYuvakFlags.put(key, mandal.isYuvak());
+            mandalCounts.put(key, 0);
         }
 
         List<MonthlySwamiStatDto> swamiStats = swamiCounts.entrySet().stream()
