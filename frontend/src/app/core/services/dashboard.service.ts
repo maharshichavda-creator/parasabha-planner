@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MonthlyDashboard } from '../models';
+import { MonthlyDashboard, YearlyDashboard } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
@@ -13,5 +13,10 @@ export class DashboardService {
   monthly(month: string): Observable<MonthlyDashboard> {
     const params = new HttpParams().set('month', month);
     return this.http.get<MonthlyDashboard>(`${this.baseUrl}/monthly`, { params });
+  }
+
+  yearly(year: number): Observable<YearlyDashboard> {
+    const params = new HttpParams().set('year', year);
+    return this.http.get<YearlyDashboard>(`${this.baseUrl}/yearly`, { params });
   }
 }

@@ -6,3 +6,4 @@ export * from './weekly-schedule-day.model';
 export * from './swami-visit.model';
 export * from './weekly-topic.model';
 export * from './monthly-dashboard.model';
+export * from './yearly-dashboard.model';

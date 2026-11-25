@@ -7,8 +7,11 @@ import com.parasabha.planner.domain.Weekday;
 import com.parasabha.planner.dto.MonthlyDashboardDto;
 import com.parasabha.planner.dto.MonthlyMandalStatDto;
 import com.parasabha.planner.dto.MonthlySwamiStatDto;
+import com.parasabha.planner.dto.YearlyDashboardDto;
 import com.parasabha.planner.repository.SwamiVisitRepository;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -34,8 +37,27 @@ public class DashboardService {
     private final SwamiVisitRepository swamiVisitRepository;
 
     public MonthlyDashboardDto getMonthlyStats(YearMonth month) {
-        LocalDate start = month.atDay(1);
-        LocalDate end = month.atEndOfMonth();
+        VisitStats stats = aggregate(month.atDay(1), month.atEndOfMonth());
+        return MonthlyDashboardDto.builder()
+                .month(month.toString())
+                .monthLabel(month.format(MONTH_LABEL_FORMAT))
+                .totalVisits(stats.totalVisits())
+                .swamiStats(stats.swamiStats())
+                .mandalStats(stats.mandalStats())
+                .build();
+    }
+
+    public YearlyDashboardDto getYearlyStats(Year year) {
+        VisitStats stats = aggregate(year.atDay(1), year.atMonth(Month.DECEMBER).atEndOfMonth());
+        return YearlyDashboardDto.builder()
+                .year(year.getValue())
+                .totalVisits(stats.totalVisits())
+                .swamiStats(stats.swamiStats())
+                .mandalStats(stats.mandalStats())
+                .build();
+    }
+
+    private VisitStats aggregate(LocalDate start, LocalDate end) {
         List<SwamiVisit> visits = swamiVisitRepository.findByVisitDateBetween(start, end);
 
         Map<Long, String> swamiNames = new LinkedHashMap<>();
@@ -87,13 +109,11 @@ public class DashboardService {
                         .thenComparing(dto -> dto.getMandalName().toLowerCase(Locale.ROOT)))
                 .toList();
 
-        return MonthlyDashboardDto.builder()
-                .month(month.toString())
-                .monthLabel(month.format(MONTH_LABEL_FORMAT))
-                .totalVisits(visits.size())
-                .swamiStats(swamiStats)
-                .mandalStats(mandalStats)
-                .build();
+        return new VisitStats(visits.size(), swamiStats, mandalStats);
+    }
+
+    private record VisitStats(int totalVisits, List<MonthlySwamiStatDto> swamiStats,
+                              List<MonthlyMandalStatDto> mandalStats) {
     }
 
     /** Groups Mandal visit counts by Mandal + whether it was a PRS-group visit, so the same

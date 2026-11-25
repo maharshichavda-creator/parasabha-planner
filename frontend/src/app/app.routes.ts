@@ -15,6 +15,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.DashboardComponent)
   },
   {
+    path: 'yearly-dashboard',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/yearly-dashboard/yearly-dashboard').then((m) => m.YearlyDashboardComponent)
+  },
+  {
     path: 'weekly',
     canActivate: [authGuard],
     loadComponent: () => import('./features/weekly-schedule/weekly-schedule').then((m) => m.WeeklyScheduleComponent)
